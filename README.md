@@ -1,3 +1,6 @@
+[![Build Status][travis-image]][travis-url]
+[![Go Report Card][goreportcard-image]][goreportcard-url]
+[![codecov][codecov-image]][codecov-url]
 # IoT Agent
 
 The IoT Agent enrolls a device with the [IoT Identity](https://github.com/CanonicalLtd/iot-identity) Service and 
@@ -28,3 +31,10 @@ go run cmd/agent/main.go -help
 
 ## Contributing
 Before contributing you should sign [Canonical's contributor agreement](https://www.ubuntu.com/legal/contributors), it’s the easiest way for you to give us permission to use your contributions.
+
+[travis-image]: https://travis-ci.org/CanonicalLtd/iot-agent.svg?branch=master
+[travis-url]: https://travis-ci.org/CanonicalLtd/iot-agent
+[goreportcard-image]: https://goreportcard.com/badge/github.com/CanonicalLtd/iot-agent
+[goreportcard-url]: https://goreportcard.com/report/github.com/CanonicalLtd/iot-agent
+[codecov-url]: https://codecov.io/gh/CanonicalLtd/iot-agent
+[codecov-image]: https://codecov.io/gh/CanonicalLtd/iot-agent/branch/master/graph/badge.svg
