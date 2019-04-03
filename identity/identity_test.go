@@ -30,7 +30,6 @@ import (
 	"github.com/CanonicalLtd/iot-agent/config"
 )
 
-
 func TestService_CheckEnrollment(t *testing.T) {
 	settings := config.ParseArgs()
 	_ = os.Remove(settings.CredentialsPath)
@@ -41,9 +40,9 @@ func TestService_CheckEnrollment(t *testing.T) {
 		wantErr bool
 		cleanUp bool
 	}{
-		{"valid",false,  false, false},
-		{"valid-secret",false,  false, true},
-		{"send-error",true,  true, true},
+		{"valid", false, false, false},
+		{"valid-secret", false, false, true},
+		{"send-error", true, true, true},
 	}
 
 	for _, tt := range tests {
@@ -74,10 +73,10 @@ func TestService_CheckEnrollment(t *testing.T) {
 	}
 }
 
-func mockSendRequest(idURL string, data []byte)  (*web.EnrollResponse, error) {
-	return &web.EnrollResponse{Enrollment:domain.Enrollment{ID:"abc123"}}, nil
+func mockSendRequest(idURL string, data []byte) (*web.EnrollResponse, error) {
+	return &web.EnrollResponse{Enrollment: domain.Enrollment{ID: "abc123"}}, nil
 }
 
-func mockSendRequestError(idURL string, data []byte)  (*web.EnrollResponse, error) {
+func mockSendRequestError(idURL string, data []byte) (*web.EnrollResponse, error) {
 	return nil, fmt.Errorf("mock send request error")
 }

@@ -1,0 +1,179 @@
+#!/bin/sh
+
+if [ "$TRAVIS_BUILD_NUMBER" ]; then
+    echo travis_fold:start:env
+    printenv | sort
+    echo travis_fold:end:env
+fi
+
+export LANG=C.UTF-8
+export LANGUAGE=en
+set -eu
+
+export GO111MODULE=off
+
+if which goctest >/dev/null; then
+    goctest="goctest"
+else
+    goctest="go test"
+fi
+COVERMODE=${COVERMODE:-atomic}
+export GOPATH="${GOPATH:-$(realpath "$(dirname "$0")"/../../../../)}"
+export PATH="$PATH:${GOPATH%%:*}/bin"
+
+STATIC=
+UNIT=
+
+case "${1:-all}" in
+    all)
+        STATIC=1
+        UNIT=1
+        ;;
+    --static)
+        STATIC=1
+        ;;
+    --unit)
+        UNIT=1
+        ;;
+    *)
+        echo "Wrong flag ${1}. To run a single suite use --static or --unit"
+        exit 1
+esac
+
+CURRENTTRAP="true"
+EXIT_CODE=99
+store_exit_code() {
+    EXIT_CODE=$?
+}
+exit_with_exit_code() {
+    exit $EXIT_CODE
+}
+addtrap() {
+    CURRENTTRAP="$CURRENTTRAP ; $1"
+    trap "store_exit_code; $CURRENTTRAP ; exit_with_exit_code" EXIT
+}
+
+endmsg() {
+    if [ $EXIT_CODE -eq 0 ]; then
+        p="success.txt"
+        m="All good, what could possibly go wrong."
+    else
+        p="failure.txt"
+        m="Crushing failure and despair."
+    fi
+    echo "$m"
+}
+addtrap endmsg
+
+# Append the coverage profile of a package to the project coverage.
+append_coverage() {
+    local profile="$1"
+    if [ -f $profile ]; then
+        cat $profile | grep -v "mode: set" >> .coverage/coverage.out
+        rm $profile
+    fi
+}
+
+
+if [ "$STATIC" = 1 ]; then
+    ./get-deps.sh
+
+    echo Checking formatting
+    fmt=""
+    for dir in $(go list -f '{{.Dir}}' ./... | grep -v '/vendor/' ); do
+        s="$(gofmt -s -l "$dir")"
+        if [ -n "$s" ]; then
+            fmt="$s\n$fmt"
+        fi
+    done
+
+    if [ -n "$fmt" ]; then
+        echo "Formatting wrong in following files:"
+        echo "$fmt"
+        exit 1
+    fi
+
+    # go vet
+    echo Running vet
+    go list ./... | grep -v '/vendor/' | xargs go vet
+
+    # golint
+    echo Install golint
+    if ! which golint >/dev/null; then
+        go get golang.org/x/lint/golint
+    fi
+    
+    echo Running lint
+    for dir in $(go list -f '{{.Dir}}' ./... | grep -v '/vendor/' ); do
+        lint="$(golint "$dir")"
+        if [ -n "$lint" ]; then
+            echo "Lint complains:"
+            echo "$lint"
+            exit 1
+        fi
+    done
+
+    echo Checking spelling errors
+    if ! which misspell >/dev/null; then
+        go get -u github.com/client9/misspell/cmd/misspell
+    fi
+    for file in *; do
+        if [ "$file" = "vendor" ] || [ "$file" = "static" ] || [ "$file" = "webapp-admin" ] || [ "$file" = "webapp-user" ] || [ "$file" = "test" ]; then
+            continue
+        fi
+        misspell -error -i auther,PROCES,PROCESSS,proces,processs,exportfs "$file"
+    done
+
+    echo Checking for ineffective assignments
+    if ! which ineffassign >/dev/null; then
+        go get -u github.com/gordonklaus/ineffassign
+    fi
+    # ineffassign knows about ignoring vendor/ \o/
+    ineffassign .
+
+    echo Checking for naked returns
+    if ! which nakedret >/dev/null; then
+        go get -u github.com/alexkohler/nakedret
+    fi
+    got=$(nakedret ./... 2>&1)
+    if [ -n "$got" ]; then
+        echo "$got"
+        exit 1
+    fi
+fi
+
+if [ ! -z "$UNIT" ]; then
+    ./get-deps.sh
+
+    # Prepare the coverage output profile.
+    rm -rf .coverage
+    mkdir .coverage
+    echo "mode: $COVERMODE" > .coverage/coverage.out
+
+    echo Building
+    go build -v github.com/CanonicalLtd/iot-agent/...
+
+    # tests
+    echo Running tests from "$PWD"
+    for pkg in $(go list ./... | grep -v '/vendor/' ); do
+        go test -i "$pkg"
+        $goctest -v -coverprofile=.coverage/profile.out -covermode="$COVERMODE" "$pkg"
+        append_coverage .coverage/profile.out
+    done
+
+    # upload to codecov.io if on travis
+    if [ "${TRAVIS_BUILD_NUMBER:-}" ]; then
+        curl -s https://codecov.io/bash | bash /dev/stdin -f .coverage/coverage.out
+    fi
+fi
+
+UNCLEAN="$(git status -s|grep ^??)" || true
+if [ -n "$UNCLEAN" ]; then
+    cat <<EOF
+
+There are files left in the git tree after the tests:
+
+$UNCLEAN
+EOF
+    exit 1
+fi

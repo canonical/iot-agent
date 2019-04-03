@@ -77,7 +77,7 @@ oe5AnCaMg/yTp0EbV9ZlHNeQYGesUkhT9ULXzsUEfhs3S6mQtnC12O1C/F7fsv1x7lSa4WvPzlb7
 Azds7xIR91OzXGFMx/PO7ZwflxBRIZw7+iFXEXWzfhzVlrUFDLr8K++g1g563UzY9P86XwGDlS7l
 /PVxRaD/Ruiw0ey94zCcn3ROBEs/`
 
-
+// MockClient is a mock snapd API client for testing
 type MockClient struct{}
 
 //func (c *MockClient) Snap(name string) (*client.Snap, *client.ResultInfo, error) {
@@ -120,6 +120,7 @@ type MockClient struct{}
 //	panic("implement me")
 //}
 
+// Known returns the known assertions for a given type
 func (c *MockClient) Known(assertTypeName string, headers map[string]string) ([]asserts.Assertion, error) {
 	panic("implement me")
 }
@@ -144,6 +145,7 @@ func (c *MockClient) Known(assertTypeName string, headers map[string]string) ([]
 //	panic("implement me")
 //}
 
+// GetEncodedAssertions returns the encoded model and serial assertions
 func (c *MockClient) GetEncodedAssertions() ([]byte, error) {
 	return []byte(fmt.Sprintf("%s\n%s", model1, serial1)), nil
 }

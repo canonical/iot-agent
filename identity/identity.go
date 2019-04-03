@@ -44,14 +44,14 @@ type UseCase interface {
 // Service implements the identity service use cases
 type Service struct {
 	Settings *config.Settings
-	Snapd snapdapi.SnapdClient
+	Snapd    snapdapi.SnapdClient
 }
 
 // NewService creates a new identity service connection
 func NewService(settings *config.Settings, snapd snapdapi.SnapdClient) *Service {
 	return &Service{
 		Settings: settings,
-		Snapd: snapd,
+		Snapd:    snapd,
 	}
 }
 
@@ -88,7 +88,7 @@ func (srv *Service) enrollDevice() (*domain.Enrollment, error) {
 	return &resp.Enrollment, err
 }
 
-var sendEnrollmentRequest = func(idURL string, data []byte)  (*web.EnrollResponse, error) {
+var sendEnrollmentRequest = func(idURL string, data []byte) (*web.EnrollResponse, error) {
 	// Format the URL for the identity service
 	u, err := url.Parse(idURL)
 	if err != nil {

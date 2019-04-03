@@ -1,0 +1,18 @@
+language: go
+go_import_path: github.com/CanonicalLtd/iot-agent
+go:
+  - 1.12
+env:
+  matrix:
+    - TEST_SUITE="--static"
+    - TEST_SUITE="--unit"
+
+before_install:
+    - go get golang.org/x/lint/golint
+    - sh ./get-deps.sh
+
+install:
+    - echo $GOPATH
+    - echo "Remaining install is done by the test script."
+    - true
+script: sh -v ./run-checks $TEST_SUITE
