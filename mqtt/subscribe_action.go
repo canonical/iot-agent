@@ -23,11 +23,12 @@ import (
 	"log"
 )
 
+// SubscribeAct is the interface for actions
 type SubscribeAct interface {
 	SnapInstall()
 }
 
-// SubscribeAction
+// SubscribeAction is the message format for the action topic
 type SubscribeAction struct {
 	ID     string
 	Action string

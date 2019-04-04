@@ -89,6 +89,7 @@ type MockClient struct{}
 //	panic("implement me")
 //}
 
+// Install mocks the snap installation
 func (c *MockClient) Install(name string, options *client.SnapOptions) (string, error) {
 	if name == "invalid" {
 		return "", fmt.Errorf("MOCK error install")

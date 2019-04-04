@@ -21,7 +21,7 @@ package mqtt
 
 import "encoding/json"
 
-// PublishResponse
+// PublishResponse is the published message showing the result of an action
 type PublishResponse struct {
 	ID      string `json:"id"`
 	Success bool   `json:"success"`

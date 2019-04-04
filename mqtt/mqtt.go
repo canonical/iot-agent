@@ -136,7 +136,7 @@ func newTLSConfig(enroll *domain.Enrollment) (*tls.Config, error) {
 	}, nil
 }
 
-// Health publishes a health message to indicate that the device is still active
+// SubscribeToActions subscribes to the action topic
 func (c *Connection) SubscribeToActions() error {
 	t := fmt.Sprintf("devices/sub/%s", c.clientID)
 	token := c.client.Subscribe(t, QOSAtLeastOnce, c.SubscribeHandler)
@@ -148,6 +148,7 @@ func (c *Connection) SubscribeToActions() error {
 	return nil
 }
 
+// SubscribeHandler is the handler for the main subscription topic
 func (c *Connection) SubscribeHandler(client MQTT.Client, msg MQTT.Message) {
 	s, err := subscribePayload(msg)
 	if err != nil {
