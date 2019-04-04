@@ -22,6 +22,7 @@ package snapdapi
 import (
 	"fmt"
 	"github.com/snapcore/snapd/asserts"
+	"github.com/snapcore/snapd/client"
 )
 
 const model1 = `type: model
@@ -87,11 +88,14 @@ type MockClient struct{}
 //func (c *MockClient) List(names []string, opts *client.ListOptions) ([]*client.Snap, error) {
 //	panic("implement me")
 //}
-//
-//func (c *MockClient) Install(name string, options *client.SnapOptions) (string, error) {
-//	panic("implement me")
-//}
-//
+
+func (c *MockClient) Install(name string, options *client.SnapOptions) (string, error) {
+	if name == "invalid" {
+		return "", fmt.Errorf("MOCK error install")
+	}
+	return "100", nil
+}
+
 //func (c *MockClient) Refresh(name string, options *client.SnapOptions) (string, error) {
 //	panic("implement me")
 //}

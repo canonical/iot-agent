@@ -1,6 +1,5 @@
 [![Build Status][travis-image]][travis-url]
 [![Go Report Card][goreportcard-image]][goreportcard-url]
-[![codecov][codecov-image]][codecov-url]
 # IoT Agent
 
 The IoT Agent enrolls a device with the [IoT Identity](https://github.com/CanonicalLtd/iot-identity) Service and 

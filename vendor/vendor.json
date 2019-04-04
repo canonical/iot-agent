@@ -39,6 +39,18 @@
 			"revisionTime": "2019-04-02T12:13:00Z"
 		},
 		{
+			"checksumSHA1": "9QgiN0DiZ4wHg05u61OG8QPSCm8=",
+			"path": "github.com/eclipse/paho.mqtt.golang",
+			"revision": "20337d8c394721c308cc6ec096990ee451a7cd7f",
+			"revisionTime": "2019-03-22T15:20:51Z"
+		},
+		{
+			"checksumSHA1": "1KxhONtvenst6Acr8Ig3I9oNF2E=",
+			"path": "github.com/eclipse/paho.mqtt.golang/packets",
+			"revision": "20337d8c394721c308cc6ec096990ee451a7cd7f",
+			"revisionTime": "2019-03-22T15:20:51Z"
+		},
+		{
 			"checksumSHA1": "WgzN84Tx+7en7p/e8gSTupIqygw=",
 			"path": "github.com/gorilla/mux",
 			"revision": "c5c6c98bc25355028a63748a498942a6398ccd22",
@@ -209,6 +221,24 @@
 		{
 			"checksumSHA1": "GtamqiJoL7PGHsN454AoffBFMa8=",
 			"path": "golang.org/x/net/context",
+			"revision": "74de082e2cca95839e88aa0aeee5aadf6ce7710f",
+			"revisionTime": "2019-03-26T08:46:22Z"
+		},
+		{
+			"checksumSHA1": "f3Y7JIZH61oMmp8nphqe8Mg+XoU=",
+			"path": "golang.org/x/net/internal/socks",
+			"revision": "74de082e2cca95839e88aa0aeee5aadf6ce7710f",
+			"revisionTime": "2019-03-26T08:46:22Z"
+		},
+		{
+			"checksumSHA1": "mCMW3hvbWFW1k5il9yyO7ELOdws=",
+			"path": "golang.org/x/net/proxy",
+			"revision": "74de082e2cca95839e88aa0aeee5aadf6ce7710f",
+			"revisionTime": "2019-03-26T08:46:22Z"
+		},
+		{
+			"checksumSHA1": "F+tqxPGFt5x7DKZakbbMmENX1oQ=",
+			"path": "golang.org/x/net/websocket",
 			"revision": "74de082e2cca95839e88aa0aeee5aadf6ce7710f",
 			"revisionTime": "2019-03-26T08:46:22Z"
 		},

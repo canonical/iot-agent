@@ -88,7 +88,7 @@ func (srv *Service) enrollDevice() (*domain.Enrollment, error) {
 	return &resp.Enrollment, err
 }
 
-var sendEnrollmentRequest = func(idURL string, data []byte) (*web.EnrollResponse, error) {
+func sendEnrollmentRequest(idURL string, data []byte) (*web.EnrollResponse, error) {
 	// Format the URL for the identity service
 	u, err := url.Parse(idURL)
 	if err != nil {
@@ -97,13 +97,7 @@ var sendEnrollmentRequest = func(idURL string, data []byte) (*web.EnrollResponse
 	u.Path = path.Join(u.Path, "v1", "device", "enroll")
 
 	// Send the request to get the credentials from the identity service
-	w, err := http.Post(u.String(), mediaType, bytes.NewReader(data))
-	if err != nil {
-		return nil, err
-	}
-
-	defer w.Body.Close()
-	resp, err := parseEnrollResponse(w.Body)
+	resp, err := sendPOSTRequest(u.String(), data)
 	if err != nil {
 		return nil, err
 	}
@@ -112,12 +106,23 @@ var sendEnrollmentRequest = func(idURL string, data []byte) (*web.EnrollResponse
 		return nil, fmt.Errorf("(%s) %s", resp.StandardResponse.Code, resp.StandardResponse.Message)
 	}
 
-	return &resp, nil
+	return resp, nil
 }
 
-func parseEnrollResponse(r io.Reader) (web.EnrollResponse, error) {
+func parseEnrollResponse(r io.Reader) (*web.EnrollResponse, error) {
 	// Parse the response
 	result := web.EnrollResponse{}
 	err := json.NewDecoder(r).Decode(&result)
-	return result, err
+	return &result, err
+}
+
+var sendPOSTRequest = func(u string, data []byte) (*web.EnrollResponse, error) {
+	// Send the request to get the credentials from the identity service
+	w, err := http.Post(u, mediaType, bytes.NewReader(data))
+	if err != nil {
+		return nil, err
+	}
+
+	defer w.Body.Close()
+	return parseEnrollResponse(w.Body)
 }

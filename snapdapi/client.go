@@ -22,13 +22,14 @@ package snapdapi
 import (
 	"github.com/snapcore/snapd/asserts"
 	"github.com/snapcore/snapd/client"
+	"sync"
 )
 
 // SnapdClient is a client of the snapd REST API
 type SnapdClient interface {
 	//Snap(name string) (*client.Snap, *client.ResultInfo, error)
 	//List(names []string, opts *client.ListOptions) ([]*client.Snap, error)
-	//Install(name string, options *client.SnapOptions) (string, error)
+	Install(name string, options *client.SnapOptions) (string, error)
 	//Refresh(name string, options *client.SnapOptions) (string, error)
 	//Revert(name string, options *client.SnapOptions) (string, error)
 	//Remove(name string, options *client.SnapOptions) (string, error)
@@ -46,16 +47,23 @@ type SnapdClient interface {
 	GetEncodedAssertions() ([]byte, error)
 }
 
+var clientOnce sync.Once
+var clientInstance *ClientAdapter
+
 // ClientAdapter adapts our expectations to the snapd client API.
 type ClientAdapter struct {
 	snapdClient *client.Client
 }
 
-// NewClientAdapter creates a new ClientAdapter for use in snapweb.
+// NewClientAdapter creates a new ClientAdapter as a singleton
 func NewClientAdapter() *ClientAdapter {
-	return &ClientAdapter{
-		snapdClient: client.New(nil),
-	}
+	clientOnce.Do(func() {
+		clientInstance = &ClientAdapter{
+			snapdClient: client.New(nil),
+		}
+	})
+
+	return clientInstance
 }
 
 //// Snap returns the most recently published revision of the snap with the
@@ -69,13 +77,13 @@ func NewClientAdapter() *ClientAdapter {
 //func (a *ClientAdapter) List(names []string, opts *client.ListOptions) ([]*client.Snap, error) {
 //	return a.snapdClient.List(names, opts)
 //}
-//
-//// Install adds the snap with the given name from the given channel (or
-//// the system default channel if not).
-//func (a *ClientAdapter) Install(name string, options *client.SnapOptions) (string, error) {
-//	return a.snapdClient.Install(name, options)
-//}
-//
+
+// Install adds the snap with the given name from the given channel (or
+// the system default channel if not).
+func (a *ClientAdapter) Install(name string, options *client.SnapOptions) (string, error) {
+	return a.snapdClient.Install(name, options)
+}
+
 //// Refresh updates the snap with the given name from the given channel (or
 //// the system default channel if not).
 //func (a *ClientAdapter) Refresh(name string, options *client.SnapOptions) (string, error) {

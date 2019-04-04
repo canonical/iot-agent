@@ -22,9 +22,9 @@ package identity
 import (
 	"fmt"
 	"github.com/CanonicalLtd/iot-agent/snapdapi"
-	"github.com/CanonicalLtd/iot-identity/domain"
 	"github.com/CanonicalLtd/iot-identity/web"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/CanonicalLtd/iot-agent/config"
@@ -48,9 +48,9 @@ func TestService_CheckEnrollment(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.sendErr {
-				sendEnrollmentRequest = mockSendRequestError
+				sendPOSTRequest = mockSendRequestError
 			} else {
-				sendEnrollmentRequest = mockSendRequest
+				sendPOSTRequest = mockSendRequest
 			}
 
 			srv := NewService(settings, snapd)
@@ -73,10 +73,12 @@ func TestService_CheckEnrollment(t *testing.T) {
 	}
 }
 
-func mockSendRequest(idURL string, data []byte) (*web.EnrollResponse, error) {
-	return &web.EnrollResponse{Enrollment: domain.Enrollment{ID: "abc123"}}, nil
+func mockSendRequest(u string, data []byte) (*web.EnrollResponse, error) {
+	const resp = `{"enrollment": {"id":"abc123"}}`
+
+	return parseEnrollResponse(strings.NewReader(resp))
 }
 
-func mockSendRequestError(idURL string, data []byte) (*web.EnrollResponse, error) {
+func mockSendRequestError(u string, data []byte) (*web.EnrollResponse, error) {
 	return nil, fmt.Errorf("mock send request error")
 }

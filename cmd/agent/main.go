@@ -20,6 +20,7 @@
 package main
 
 import (
+	"github.com/CanonicalLtd/iot-agent/mqtt"
 	"github.com/CanonicalLtd/iot-agent/snapdapi"
 	"log"
 	"time"
@@ -30,12 +31,16 @@ import (
 
 const tickInterval = 60
 
+var mqttConn *mqtt.Connection
+
 func main() {
 	log.Println("Starting IoT agent")
 
 	// Set up the dependency chain
 	settings := config.ParseArgs()
 	snap := snapdapi.NewClientAdapter()
+
+	defer mqttConn.Close()
 
 	// On an interval...
 	ticker := time.NewTicker(time.Second * tickInterval)
@@ -48,9 +53,15 @@ func main() {
 			continue
 		}
 
-		log.Println(enroll)
+		// Create/get the MQTT connection
+		mqttConn, err = mqtt.GetConnection(enroll)
+		if err != nil {
+			log.Printf("Error with MQTT connection: %v", err)
+			continue
+		}
 
-		// Publish scheduled messages
+		// Publish the health check message
+		mqttConn.Health()
 	}
 	ticker.Stop()
 }
