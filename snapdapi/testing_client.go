@@ -104,11 +104,12 @@ func (c *MockClient) Install(name string, options *client.SnapOptions) (string, 
 //func (c *MockClient) Revert(name string, options *client.SnapOptions) (string, error) {
 //	panic("implement me")
 //}
-//
-//func (c *MockClient) Remove(name string, options *client.SnapOptions) (string, error) {
-//	panic("implement me")
-//}
-//
+
+// Remove mocks a snap removal
+func (c *MockClient) Remove(name string, options *client.SnapOptions) (string, error) {
+	return "101", nil
+}
+
 //func (c *MockClient) Enable(name string, options *client.SnapOptions) (string, error) {
 //	panic("implement me")
 //}

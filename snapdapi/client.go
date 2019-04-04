@@ -32,7 +32,7 @@ type SnapdClient interface {
 	Install(name string, options *client.SnapOptions) (string, error)
 	//Refresh(name string, options *client.SnapOptions) (string, error)
 	//Revert(name string, options *client.SnapOptions) (string, error)
-	//Remove(name string, options *client.SnapOptions) (string, error)
+	Remove(name string, options *client.SnapOptions) (string, error)
 	//Enable(name string, options *client.SnapOptions) (string, error)
 	//Disable(name string, options *client.SnapOptions) (string, error)
 	//ServerVersion() (*client.ServerVersion, error)
@@ -94,12 +94,12 @@ func (a *ClientAdapter) Install(name string, options *client.SnapOptions) (strin
 //func (a *ClientAdapter) Revert(name string, options *client.SnapOptions) (string, error) {
 //	return a.snapdClient.Revert(name, options)
 //}
-//
-//// Remove removes the snap with the given name.
-//func (a *ClientAdapter) Remove(name string, options *client.SnapOptions) (string, error) {
-//	return a.snapdClient.Remove(name, options)
-//}
-//
+
+// Remove removes the snap with the given name.
+func (a *ClientAdapter) Remove(name string, options *client.SnapOptions) (string, error) {
+	return a.snapdClient.Remove(name, options)
+}
+
 //// Enable activates the snap with the given name.
 //func (a *ClientAdapter) Enable(name string, options *client.SnapOptions) (string, error) {
 //	return a.snapdClient.Enable(name, options)

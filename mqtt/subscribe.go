@@ -37,6 +37,13 @@ func performAction(s *SubscribeAction) ([]byte, error) {
 		}
 		return serializeResponse(PublishResponse{ID: s.ID, Success: true, Message: r})
 
+	case "remove":
+		r, err := s.SnapRemove()
+		if err != nil {
+			return serializeResponse(PublishResponse{ID: s.ID, Success: false, Message: err.Error()})
+		}
+		return serializeResponse(PublishResponse{ID: s.ID, Success: true, Message: r})
+
 	default:
 		return nil, fmt.Errorf("unhandled action: %s", s.Action)
 	}

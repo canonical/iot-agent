@@ -35,7 +35,7 @@ type SubscribeAction struct {
 	Snap   string
 }
 
-// SnapInstall installs new snaps
+// SnapInstall installs a new snap
 func (act *SubscribeAction) SnapInstall() (string, error) {
 	if len(act.Snap) == 0 {
 		log.Println("Error: no snap name provided for install")
@@ -44,4 +44,15 @@ func (act *SubscribeAction) SnapInstall() (string, error) {
 
 	snapd := snapdapi.NewClientAdapter()
 	return snapd.Install(act.Snap, nil)
+}
+
+// SnapRemove removes an existing snap
+func (act *SubscribeAction) SnapRemove() (string, error) {
+	if len(act.Snap) == 0 {
+		log.Println("Error: no snap name provided for install")
+		return "", fmt.Errorf("no snap name provided for install")
+	}
+
+	snapd := snapdapi.NewClientAdapter()
+	return snapd.Remove(act.Snap, nil)
 }

@@ -29,6 +29,9 @@ func TestConnection_Workflow(t *testing.T) {
 	m1 := `{"id": "abc123", "action":"install", "snap":"helloworld"}`
 	m2 := `{"id": "abc123", "action":"install"}`
 	m3 := `{"id": "abc123", "action":"invalid", "snap":"helloworld"}`
+	m4 := `{"id": "abc123", "action":"remove", "snap":"helloworld"}`
+	m5 := `{"id": "abc123", "action":"remove"}`
+	m6 := `\u1000`
 
 	enroll := &domain.Enrollment{
 		Credentials: domain.Credentials{
@@ -41,11 +44,15 @@ func TestConnection_Workflow(t *testing.T) {
 		name    string
 		open    bool
 		message MQTT.Message
+		withErr bool
 	}{
-		{"valid-closed", false, &MockMessage{[]byte(m1)}},
-		{"valid-open", true, &MockMessage{[]byte(m1)}},
-		{"no-snap", true, &MockMessage{[]byte(m2)}},
-		{"invalid-action", true, &MockMessage{[]byte(m3)}},
+		{"valid-closed", false, &MockMessage{[]byte(m1)}, false},
+		{"valid-open", true, &MockMessage{[]byte(m1)}, false},
+		{"no-snap", true, &MockMessage{[]byte(m2)}, false},
+		{"invalid-action", true, &MockMessage{[]byte(m3)}, true},
+		{"valid-remove", true, &MockMessage{[]byte(m4)}, false},
+		{"no-snap-remove", true, &MockMessage{[]byte(m5)}, false},
+		{"bad-data", true, &MockMessage{[]byte(m6)}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -68,7 +75,16 @@ func TestConnection_Workflow(t *testing.T) {
 			c.SubscribeHandler(client, tt.message)
 
 			// Check again with the action
-
+			sa, err := subscribePayload(tt.message)
+			if err != nil && !tt.withErr {
+				t.Error("TestConnection_Workflow: payload - expected error got none")
+				return
+			}
+			_, err = performAction(sa)
+			if err != nil && !tt.withErr {
+				t.Error("TestConnection_Workflow: action - expected error got none")
+				return
+			}
 		})
 	}
 }
