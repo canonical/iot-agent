@@ -128,14 +128,22 @@ func (c *MockClient) Remove(name string, options *client.SnapOptions) (string, e
 	return "101", nil
 }
 
-//func (c *MockClient) Enable(name string, options *client.SnapOptions) (string, error) {
-//	panic("implement me")
-//}
-//
-//func (c *MockClient) Disable(name string, options *client.SnapOptions) (string, error) {
-//	panic("implement me")
-//}
-//
+// Enable mocks a snap enable
+func (c *MockClient) Enable(name string, options *client.SnapOptions) (string, error) {
+	if name == "invalid" {
+		return "", fmt.Errorf("MOCK error enable")
+	}
+	return "104", nil
+}
+
+// Disable mocks a snap disable
+func (c *MockClient) Disable(name string, options *client.SnapOptions) (string, error) {
+	if name == "invalid" {
+		return "", fmt.Errorf("MOCK error disable")
+	}
+	return "105", nil
+}
+
 //func (c *MockClient) ServerVersion() (*client.ServerVersion, error) {
 //	panic("implement me")
 //}
@@ -149,14 +157,22 @@ func (c *MockClient) Known(assertTypeName string, headers map[string]string) ([]
 	panic("implement me")
 }
 
-//func (c *MockClient) Conf(name string) (map[string]interface{}, error) {
-//	panic("implement me")
-//}
-//
-//func (c *MockClient) SetConf(name string, patch map[string]interface{}) (string, error) {
-//	panic("implement me")
-//}
-//
+// Conf mocks returning config
+func (c *MockClient) Conf(name string) (map[string]interface{}, error) {
+	if name == "invalid" {
+		return nil, fmt.Errorf("MOCK error conf")
+	}
+	return map[string]interface{}{"setting": "value"}, nil
+}
+
+// SetConf mocks setting the config
+func (c *MockClient) SetConf(name string, patch map[string]interface{}) (string, error) {
+	if name == "invalid" {
+		return "106", fmt.Errorf("MOCK error set conf")
+	}
+	return "106", nil
+}
+
 //func (c *MockClient) Find(opts *client.FindOptions) ([]*client.Snap, *client.ResultInfo, error) {
 //	panic("implement me")
 //}

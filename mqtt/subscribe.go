@@ -41,6 +41,14 @@ func performAction(s *SubscribeAction) ([]byte, error) {
 		result = s.SnapRefresh()
 	case "revert":
 		result = s.SnapRevert()
+	case "enable":
+		result = s.SnapEnable()
+	case "disable":
+		result = s.SnapDisable()
+	case "conf":
+		result = s.SnapConf()
+	case "setconf":
+		result = s.SnapSetConf()
 
 	default:
 		return nil, fmt.Errorf("unhandled action: %s", s.Action)

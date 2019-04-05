@@ -20,9 +20,11 @@
 package mqtt
 
 import (
+	"encoding/json"
 	"github.com/CanonicalLtd/iot-agent/snapdapi"
 	"github.com/CanonicalLtd/iot-identity/domain"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
+	"log"
 	"testing"
 )
 
@@ -42,6 +44,19 @@ func TestConnection_Workflow(t *testing.T) {
 	m5b := `{"id": "abc123", "action":"revert"}`
 	m5c := `{"id": "abc123", "action":"revert", "snap":"invalid"}`
 	m6a := `{"id": "abc123", "action":"list"}`
+	m7a := `{"id": "abc123", "action":"enable", "snap":"helloworld"}`
+	m7b := `{"id": "abc123", "action":"enable"}`
+	m7c := `{"id": "abc123", "action":"enable", "snap":"invalid"}`
+	m8a := `{"id": "abc123", "action":"disable", "snap":"helloworld"}`
+	m8b := `{"id": "abc123", "action":"disable"}`
+	m8c := `{"id": "abc123", "action":"disable", "snap":"invalid"}`
+	m9a := `{"id": "abc123", "action":"conf", "snap":"helloworld"}`
+	m9b := `{"id": "abc123", "action":"conf"}`
+	m9c := `{"id": "abc123", "action":"conf", "snap":"invalid"}`
+	m10a := `{"id": "abc123", "action":"setconf", "snap":"helloworld", "data":"{\"title\": \"Hello World!\"}"}`
+	m10b := `{"id": "abc123", "action":"setconf"}`
+	m10c := `{"id": "abc123", "action":"setconf", "snap":"invalid", "data":"{\"title\": \"Hello World!\"}"}`
+	m10d := `{"id": "abc123", "action":"setconf", "snap":"helloworld", "data":"\u1000"}`
 
 	enroll := &domain.Enrollment{
 		Credentials: domain.Credentials{
@@ -56,28 +71,46 @@ func TestConnection_Workflow(t *testing.T) {
 		open    bool
 		message MQTT.Message
 		withErr bool
+		respErr bool
 	}{
-		{"valid-closed", false, &MockMessage{[]byte(m1a)}, false},
-		{"valid-open", true, &MockMessage{[]byte(m1a)}, false},
-		{"no-snap", true, &MockMessage{[]byte(m1b)}, false},
-		{"invalid-install", true, &MockMessage{[]byte(m1c)}, false},
+		{"valid-closed", false, &MockMessage{[]byte(m1a)}, false, false},
+		{"valid-open", true, &MockMessage{[]byte(m1a)}, false, false},
+		{"no-snap", true, &MockMessage{[]byte(m1b)}, false, true},
+		{"invalid-install", true, &MockMessage{[]byte(m1c)}, false, true},
 
-		{"invalid-action", true, &MockMessage{[]byte(m2a)}, true},
-		{"bad-data", true, &MockMessage{[]byte(m2b)}, true},
+		{"invalid-action", true, &MockMessage{[]byte(m2a)}, true, true},
+		{"bad-data", true, &MockMessage{[]byte(m2b)}, true, true},
 
-		{"valid-remove", true, &MockMessage{[]byte(m3a)}, false},
-		{"no-snap-remove", true, &MockMessage{[]byte(m3b)}, false},
-		{"invalid-remove", true, &MockMessage{[]byte(m3c)}, false},
+		{"valid-remove", true, &MockMessage{[]byte(m3a)}, false, false},
+		{"no-snap-remove", true, &MockMessage{[]byte(m3b)}, false, true},
+		{"invalid-remove", true, &MockMessage{[]byte(m3c)}, false, true},
 
-		{"valid-refresh", true, &MockMessage{[]byte(m4a)}, false},
-		{"no-snap-refresh", true, &MockMessage{[]byte(m4b)}, false},
-		{"invalid-refresh", true, &MockMessage{[]byte(m4c)}, false},
+		{"valid-refresh", true, &MockMessage{[]byte(m4a)}, false, false},
+		{"no-snap-refresh", true, &MockMessage{[]byte(m4b)}, false, true},
+		{"invalid-refresh", true, &MockMessage{[]byte(m4c)}, false, true},
 
-		{"valid-revert", true, &MockMessage{[]byte(m5a)}, false},
-		{"no-snap-revert", true, &MockMessage{[]byte(m5b)}, false},
-		{"invalid-revert", true, &MockMessage{[]byte(m5c)}, false},
+		{"valid-revert", true, &MockMessage{[]byte(m5a)}, false, false},
+		{"no-snap-revert", true, &MockMessage{[]byte(m5b)}, false, true},
+		{"invalid-revert", true, &MockMessage{[]byte(m5c)}, false, true},
 
-		{"valid-list", true, &MockMessage{[]byte(m6a)}, false},
+		{"valid-list", true, &MockMessage{[]byte(m6a)}, false, false},
+
+		{"valid-enable", true, &MockMessage{[]byte(m7a)}, false, false},
+		{"no-snap-enable", true, &MockMessage{[]byte(m7b)}, false, true},
+		{"invalid-enable", true, &MockMessage{[]byte(m7c)}, false, true},
+
+		{"valid-disable", true, &MockMessage{[]byte(m8a)}, false, false},
+		{"no-snap-disable", true, &MockMessage{[]byte(m8b)}, false, true},
+		{"invalid-disable", true, &MockMessage{[]byte(m8c)}, false, true},
+
+		{"valid-conf", true, &MockMessage{[]byte(m9a)}, false, false},
+		{"no-snap-conf", true, &MockMessage{[]byte(m9b)}, false, true},
+		{"invalid-conf", true, &MockMessage{[]byte(m9c)}, false, true},
+
+		{"valid-setconf", true, &MockMessage{[]byte(m10a)}, false, false},
+		{"no-snap-setconf", true, &MockMessage{[]byte(m10b)}, false, true},
+		{"invalid-setconf", true, &MockMessage{[]byte(m10c)}, false, true},
+		{"bad-data-setconf", true, &MockMessage{[]byte(m10d)}, false, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -105,11 +138,35 @@ func TestConnection_Workflow(t *testing.T) {
 				t.Error("TestConnection_Workflow: payload - expected error got none")
 				return
 			}
-			_, err = performAction(sa)
+			resp, err := performAction(sa)
 			if err != nil && !tt.withErr {
 				t.Error("TestConnection_Workflow: action - expected error got none")
 				return
 			}
+
+			r, err := deserializePublishResponse(resp)
+			if err != nil && !tt.withErr {
+				t.Errorf("TestConnection_Workflow: publish response: %v", err)
+				return
+			}
+			if r == nil {
+				t.Error("TestConnection_Workflow: publish response is nil")
+				return
+			}
+			if r.Success == tt.respErr {
+				t.Errorf("TestConnection_Workflow: publish response unexpected: %s", r.Message)
+			}
 		})
 	}
+}
+
+func deserializePublishResponse(data []byte) (*PublishResponse, error) {
+	s := PublishResponse{}
+
+	// Decode the message payload - the list of snaps
+	err := json.Unmarshal(data, &s)
+	if err != nil {
+		log.Println("Error decoding the published message:", err)
+	}
+	return &s, err
 }

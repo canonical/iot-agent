@@ -18,6 +18,7 @@
 package mqtt
 
 import (
+	"encoding/json"
 	"github.com/CanonicalLtd/iot-agent/snapdapi"
 )
 
@@ -28,9 +29,10 @@ type SubscribeAct interface {
 
 // SubscribeAction is the message format for the action topic
 type SubscribeAction struct {
-	ID     string
-	Action string
-	Snap   string
+	ID     string `json:"id"`
+	Action string `json:"action"`
+	Snap   string `json:"snap"`
+	Data   string `json:"data"`
 }
 
 var snapd snapdapi.SnapdClient = snapdapi.NewClientAdapter()
@@ -98,5 +100,69 @@ func (act *SubscribeAction) SnapRevert() PublishResponse {
 	if err != nil {
 		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
 	}
+	return PublishResponse{ID: act.ID, Success: true, Result: result}
+}
+
+// SnapEnable enables an existing snap
+func (act *SubscribeAction) SnapEnable() PublishResponse {
+	if len(act.Snap) == 0 {
+		return PublishResponse{ID: act.ID, Success: false, Message: "No snap name provided for enable"}
+	}
+
+	// Call the snapd API
+	result, err := snapd.Enable(act.Snap, nil)
+	if err != nil {
+		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+	}
+	return PublishResponse{ID: act.ID, Success: true, Result: result}
+}
+
+// SnapDisable disables an existing snap
+func (act *SubscribeAction) SnapDisable() PublishResponse {
+	if len(act.Snap) == 0 {
+		return PublishResponse{ID: act.ID, Success: false, Message: "No snap name provided for disable"}
+	}
+
+	// Call the snapd API
+	result, err := snapd.Disable(act.Snap, nil)
+	if err != nil {
+		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+	}
+	return PublishResponse{ID: act.ID, Success: true, Result: result}
+}
+
+// SnapConf gets the config for a snap
+func (act *SubscribeAction) SnapConf() PublishResponse {
+	if len(act.Snap) == 0 {
+		return PublishResponse{ID: act.ID, Success: false, Message: "No snap name provided for config"}
+	}
+
+	// Call the snapd API
+	result, err := snapd.Conf(act.Snap)
+	if err != nil {
+		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+	}
+
+	return PublishResponse{ID: act.ID, Success: true, Result: result}
+}
+
+// SnapSetConf sets the config for a snap
+func (act *SubscribeAction) SnapSetConf() PublishResponse {
+	if len(act.Snap) == 0 {
+		return PublishResponse{ID: act.ID, Success: false, Message: "No snap name provided for set config"}
+	}
+
+	// Deserialize the settings
+	var data map[string]interface{}
+	if err := json.Unmarshal([]byte(act.Data), &data); err != nil {
+		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+	}
+
+	// Call the snapd API
+	result, err := snapd.SetConf(act.Snap, data)
+	if err != nil {
+		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+	}
+
 	return PublishResponse{ID: act.ID, Success: true, Result: result}
 }

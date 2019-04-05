@@ -33,13 +33,13 @@ type SnapdClient interface {
 	Refresh(name string, options *client.SnapOptions) (string, error)
 	Revert(name string, options *client.SnapOptions) (string, error)
 	Remove(name string, options *client.SnapOptions) (string, error)
-	//Enable(name string, options *client.SnapOptions) (string, error)
-	//Disable(name string, options *client.SnapOptions) (string, error)
+	Enable(name string, options *client.SnapOptions) (string, error)
+	Disable(name string, options *client.SnapOptions) (string, error)
 	//ServerVersion() (*client.ServerVersion, error)
 	//Ack(b []byte) error
 	Known(assertTypeName string, headers map[string]string) ([]asserts.Assertion, error)
-	//Conf(name string) (map[string]interface{}, error)
-	//SetConf(name string, patch map[string]interface{}) (string, error)
+	Conf(name string) (map[string]interface{}, error)
+	SetConf(name string, patch map[string]interface{}) (string, error)
 	//Find(opts *client.FindOptions) ([]*client.Snap, *client.ResultInfo, error)
 	//FindOne(name string) (*client.Snap, *client.ResultInfo, error)
 	//FindSnaps(query, section string, private bool) ([]*client.Snap, *client.ResultInfo, error)
@@ -100,41 +100,41 @@ func (a *ClientAdapter) Remove(name string, options *client.SnapOptions) (string
 	return a.snapdClient.Remove(name, options)
 }
 
-//// Enable activates the snap with the given name.
-//func (a *ClientAdapter) Enable(name string, options *client.SnapOptions) (string, error) {
-//	return a.snapdClient.Enable(name, options)
-//}
-//
-//// Disable deactivates the snap with the given name.
-//func (a *ClientAdapter) Disable(name string, options *client.SnapOptions) (string, error) {
-//	return a.snapdClient.Disable(name, options)
-//}
-//
+// Enable activates the snap with the given name.
+func (a *ClientAdapter) Enable(name string, options *client.SnapOptions) (string, error) {
+	return a.snapdClient.Enable(name, options)
+}
+
+// Disable deactivates the snap with the given name.
+func (a *ClientAdapter) Disable(name string, options *client.SnapOptions) (string, error) {
+	return a.snapdClient.Disable(name, options)
+}
+
 //// ServerVersion returns information about the snapd server.
 //func (a *ClientAdapter) ServerVersion() (*client.ServerVersion, error) {
 //	return a.snapdClient.ServerVersion()
 //}
-//
-//// Ack adds a new assertion to the system
-//func (a *ClientAdapter) Ack(b []byte) error {
-//	return a.snapdClient.Ack(b)
-//}
+
+// Ack adds a new assertion to the system
+func (a *ClientAdapter) Ack(b []byte) error {
+	return a.snapdClient.Ack(b)
+}
 
 // Known queries assertions with type assertTypeName and matching assertion headers.
 func (a *ClientAdapter) Known(assertTypeName string, headers map[string]string) ([]asserts.Assertion, error) {
 	return a.snapdClient.Known(assertTypeName, headers)
 }
 
-//// Conf gets the snap's current configuration
-//func (a *ClientAdapter) Conf(name string) (map[string]interface{}, error) {
-//	return a.snapdClient.Conf(name, []string{})
-//}
-//
-//// SetConf requests a snap to apply the provided patch to the configuration
-//func (a *ClientAdapter) SetConf(name string, patch map[string]interface{}) (string, error) {
-//	return a.snapdClient.SetConf(name, patch)
-//}
-//
+// Conf gets the snap's current configuration
+func (a *ClientAdapter) Conf(name string) (map[string]interface{}, error) {
+	return a.snapdClient.Conf(name, []string{})
+}
+
+// SetConf requests a snap to apply the provided patch to the configuration
+func (a *ClientAdapter) SetConf(name string, patch map[string]interface{}) (string, error) {
+	return a.snapdClient.SetConf(name, patch)
+}
+
 //// FindOne returns a list of snaps available for install from the
 //// store for this system and that match the query
 //func (a *ClientAdapter) FindOne(name string) (*client.Snap, *client.ResultInfo, error) {
