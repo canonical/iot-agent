@@ -18,9 +18,7 @@
 package mqtt
 
 import (
-	"fmt"
 	"github.com/CanonicalLtd/iot-agent/snapdapi"
-	"log"
 )
 
 // SubscribeAct is the interface for actions
@@ -35,24 +33,70 @@ type SubscribeAction struct {
 	Snap   string
 }
 
+var snapd snapdapi.SnapdClient = snapdapi.NewClientAdapter()
+
 // SnapInstall installs a new snap
-func (act *SubscribeAction) SnapInstall() (string, error) {
+func (act *SubscribeAction) SnapInstall() PublishResponse {
 	if len(act.Snap) == 0 {
-		log.Println("Error: no snap name provided for install")
-		return "", fmt.Errorf("no snap name provided for install")
+		return PublishResponse{ID: act.ID, Success: false, Message: "No snap name provided for install"}
 	}
 
-	snapd := snapdapi.NewClientAdapter()
-	return snapd.Install(act.Snap, nil)
+	// Call the snapd API
+	result, err := snapd.Install(act.Snap, nil)
+	if err != nil {
+		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+	}
+	return PublishResponse{ID: act.ID, Success: true, Result: result}
 }
 
 // SnapRemove removes an existing snap
-func (act *SubscribeAction) SnapRemove() (string, error) {
+func (act *SubscribeAction) SnapRemove() PublishResponse {
 	if len(act.Snap) == 0 {
-		log.Println("Error: no snap name provided for install")
-		return "", fmt.Errorf("no snap name provided for install")
+		return PublishResponse{ID: act.ID, Success: false, Message: "No snap name provided for remove"}
 	}
 
-	snapd := snapdapi.NewClientAdapter()
-	return snapd.Remove(act.Snap, nil)
+	// Call the snapd API
+	result, err := snapd.Remove(act.Snap, nil)
+	if err != nil {
+		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+	}
+	return PublishResponse{ID: act.ID, Success: true, Result: result}
+}
+
+// SnapList lists installed snaps
+func (act *SubscribeAction) SnapList() PublishResponse {
+	// Call the snapd API
+	snaps, err := snapd.List([]string{}, nil)
+	if err != nil {
+		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+	}
+	return PublishResponse{ID: act.ID, Success: true, Result: snaps}
+}
+
+// SnapRefresh refreshes an existing snap
+func (act *SubscribeAction) SnapRefresh() PublishResponse {
+	if len(act.Snap) == 0 {
+		return PublishResponse{ID: act.ID, Success: false, Message: "No snap name provided for refresh"}
+	}
+
+	// Call the snapd API
+	result, err := snapd.Refresh(act.Snap, nil)
+	if err != nil {
+		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+	}
+	return PublishResponse{ID: act.ID, Success: true, Result: result}
+}
+
+// SnapRevert reverts an existing snap
+func (act *SubscribeAction) SnapRevert() PublishResponse {
+	if len(act.Snap) == 0 {
+		return PublishResponse{ID: act.ID, Success: false, Message: "No snap name provided for revert"}
+	}
+
+	// Call the snapd API
+	result, err := snapd.Revert(act.Snap, nil)
+	if err != nil {
+		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+	}
+	return PublishResponse{ID: act.ID, Success: true, Result: result}
 }

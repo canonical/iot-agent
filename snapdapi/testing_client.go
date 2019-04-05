@@ -84,10 +84,17 @@ type MockClient struct{}
 //func (c *MockClient) Snap(name string) (*client.Snap, *client.ResultInfo, error) {
 //	panic("implement me")
 //}
-//
-//func (c *MockClient) List(names []string, opts *client.ListOptions) ([]*client.Snap, error) {
-//	panic("implement me")
-//}
+
+// List lists installed snaps
+func (c *MockClient) List(names []string, opts *client.ListOptions) ([]*client.Snap, error) {
+	return []*client.Snap{
+		{
+			ID:      "1",
+			Title:   "helloworld",
+			Summary: "Welcomes the world",
+		},
+	}, nil
+}
 
 // Install mocks the snap installation
 func (c *MockClient) Install(name string, options *client.SnapOptions) (string, error) {
@@ -97,16 +104,27 @@ func (c *MockClient) Install(name string, options *client.SnapOptions) (string, 
 	return "100", nil
 }
 
-//func (c *MockClient) Refresh(name string, options *client.SnapOptions) (string, error) {
-//	panic("implement me")
-//}
-//
-//func (c *MockClient) Revert(name string, options *client.SnapOptions) (string, error) {
-//	panic("implement me")
-//}
+// Refresh refreshes an existing snap
+func (c *MockClient) Refresh(name string, options *client.SnapOptions) (string, error) {
+	if name == "invalid" {
+		return "", fmt.Errorf("MOCK error refresh")
+	}
+	return "102", nil
+}
+
+// Revert reverts an existing snap
+func (c *MockClient) Revert(name string, options *client.SnapOptions) (string, error) {
+	if name == "invalid" {
+		return "", fmt.Errorf("MOCK error revert")
+	}
+	return "103", nil
+}
 
 // Remove mocks a snap removal
 func (c *MockClient) Remove(name string, options *client.SnapOptions) (string, error) {
+	if name == "invalid" {
+		return "", fmt.Errorf("MOCK error remove")
+	}
 	return "101", nil
 }
 

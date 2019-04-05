@@ -28,10 +28,10 @@ import (
 // SnapdClient is a client of the snapd REST API
 type SnapdClient interface {
 	//Snap(name string) (*client.Snap, *client.ResultInfo, error)
-	//List(names []string, opts *client.ListOptions) ([]*client.Snap, error)
+	List(names []string, opts *client.ListOptions) ([]*client.Snap, error)
 	Install(name string, options *client.SnapOptions) (string, error)
-	//Refresh(name string, options *client.SnapOptions) (string, error)
-	//Revert(name string, options *client.SnapOptions) (string, error)
+	Refresh(name string, options *client.SnapOptions) (string, error)
+	Revert(name string, options *client.SnapOptions) (string, error)
 	Remove(name string, options *client.SnapOptions) (string, error)
 	//Enable(name string, options *client.SnapOptions) (string, error)
 	//Disable(name string, options *client.SnapOptions) (string, error)
@@ -71,12 +71,12 @@ func NewClientAdapter() *ClientAdapter {
 //func (a *ClientAdapter) Snap(name string) (*client.Snap, *client.ResultInfo, error) {
 //	return a.snapdClient.Snap(name)
 //}
-//
-//// List returns the list of all snaps installed on the system
-//// with names in the given list; if the list is empty, all snaps.
-//func (a *ClientAdapter) List(names []string, opts *client.ListOptions) ([]*client.Snap, error) {
-//	return a.snapdClient.List(names, opts)
-//}
+
+// List returns the list of all snaps installed on the system
+// with names in the given list; if the list is empty, all snaps.
+func (a *ClientAdapter) List(names []string, opts *client.ListOptions) ([]*client.Snap, error) {
+	return a.snapdClient.List(names, opts)
+}
 
 // Install adds the snap with the given name from the given channel (or
 // the system default channel if not).
@@ -84,16 +84,16 @@ func (a *ClientAdapter) Install(name string, options *client.SnapOptions) (strin
 	return a.snapdClient.Install(name, options)
 }
 
-//// Refresh updates the snap with the given name from the given channel (or
-//// the system default channel if not).
-//func (a *ClientAdapter) Refresh(name string, options *client.SnapOptions) (string, error) {
-//	return a.snapdClient.Refresh(name, options)
-//}
-//
-//// Revert rolls the snap back to the previous on-disk state
-//func (a *ClientAdapter) Revert(name string, options *client.SnapOptions) (string, error) {
-//	return a.snapdClient.Revert(name, options)
-//}
+// Refresh updates the snap with the given name from the given channel (or
+// the system default channel if not).
+func (a *ClientAdapter) Refresh(name string, options *client.SnapOptions) (string, error) {
+	return a.snapdClient.Refresh(name, options)
+}
+
+// Revert rolls the snap back to the previous on-disk state
+func (a *ClientAdapter) Revert(name string, options *client.SnapOptions) (string, error) {
+	return a.snapdClient.Revert(name, options)
+}
 
 // Remove removes the snap with the given name.
 func (a *ClientAdapter) Remove(name string, options *client.SnapOptions) (string, error) {

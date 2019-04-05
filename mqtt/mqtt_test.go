@@ -20,18 +20,28 @@
 package mqtt
 
 import (
+	"github.com/CanonicalLtd/iot-agent/snapdapi"
 	"github.com/CanonicalLtd/iot-identity/domain"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"testing"
 )
 
 func TestConnection_Workflow(t *testing.T) {
-	m1 := `{"id": "abc123", "action":"install", "snap":"helloworld"}`
-	m2 := `{"id": "abc123", "action":"install"}`
-	m3 := `{"id": "abc123", "action":"invalid", "snap":"helloworld"}`
-	m4 := `{"id": "abc123", "action":"remove", "snap":"helloworld"}`
-	m5 := `{"id": "abc123", "action":"remove"}`
-	m6 := `\u1000`
+	m1a := `{"id": "abc123", "action":"install", "snap":"helloworld"}`
+	m1b := `{"id": "abc123", "action":"install"}`
+	m1c := `{"id": "abc123", "action":"install", "snap":"invalid"}`
+	m2a := `{"id": "abc123", "action":"invalid", "snap":"helloworld"}`
+	m2b := `\u1000`
+	m3a := `{"id": "abc123", "action":"remove", "snap":"helloworld"}`
+	m3b := `{"id": "abc123", "action":"remove"}`
+	m3c := `{"id": "abc123", "action":"remove", "snap":"invalid"}`
+	m4a := `{"id": "abc123", "action":"refresh", "snap":"helloworld"}`
+	m4b := `{"id": "abc123", "action":"refresh"}`
+	m4c := `{"id": "abc123", "action":"refresh", "snap":"invalid"}`
+	m5a := `{"id": "abc123", "action":"revert", "snap":"helloworld"}`
+	m5b := `{"id": "abc123", "action":"revert"}`
+	m5c := `{"id": "abc123", "action":"revert", "snap":"invalid"}`
+	m6a := `{"id": "abc123", "action":"list"}`
 
 	enroll := &domain.Enrollment{
 		Credentials: domain.Credentials{
@@ -40,19 +50,34 @@ func TestConnection_Workflow(t *testing.T) {
 		},
 	}
 	client = &MockClient{}
+	snapd = &snapdapi.MockClient{}
 	tests := []struct {
 		name    string
 		open    bool
 		message MQTT.Message
 		withErr bool
 	}{
-		{"valid-closed", false, &MockMessage{[]byte(m1)}, false},
-		{"valid-open", true, &MockMessage{[]byte(m1)}, false},
-		{"no-snap", true, &MockMessage{[]byte(m2)}, false},
-		{"invalid-action", true, &MockMessage{[]byte(m3)}, true},
-		{"valid-remove", true, &MockMessage{[]byte(m4)}, false},
-		{"no-snap-remove", true, &MockMessage{[]byte(m5)}, false},
-		{"bad-data", true, &MockMessage{[]byte(m6)}, true},
+		{"valid-closed", false, &MockMessage{[]byte(m1a)}, false},
+		{"valid-open", true, &MockMessage{[]byte(m1a)}, false},
+		{"no-snap", true, &MockMessage{[]byte(m1b)}, false},
+		{"invalid-install", true, &MockMessage{[]byte(m1c)}, false},
+
+		{"invalid-action", true, &MockMessage{[]byte(m2a)}, true},
+		{"bad-data", true, &MockMessage{[]byte(m2b)}, true},
+
+		{"valid-remove", true, &MockMessage{[]byte(m3a)}, false},
+		{"no-snap-remove", true, &MockMessage{[]byte(m3b)}, false},
+		{"invalid-remove", true, &MockMessage{[]byte(m3c)}, false},
+
+		{"valid-refresh", true, &MockMessage{[]byte(m4a)}, false},
+		{"no-snap-refresh", true, &MockMessage{[]byte(m4b)}, false},
+		{"invalid-refresh", true, &MockMessage{[]byte(m4c)}, false},
+
+		{"valid-revert", true, &MockMessage{[]byte(m5a)}, false},
+		{"no-snap-revert", true, &MockMessage{[]byte(m5b)}, false},
+		{"invalid-revert", true, &MockMessage{[]byte(m5c)}, false},
+
+		{"valid-list", true, &MockMessage{[]byte(m6a)}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -75,7 +100,7 @@ func TestConnection_Workflow(t *testing.T) {
 			c.SubscribeHandler(client, tt.message)
 
 			// Check again with the action
-			sa, err := subscribePayload(tt.message)
+			sa, err := deserializePayload(tt.message)
 			if err != nil && !tt.withErr {
 				t.Error("TestConnection_Workflow: payload - expected error got none")
 				return

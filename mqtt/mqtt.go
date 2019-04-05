@@ -150,7 +150,7 @@ func (c *Connection) SubscribeToActions() error {
 
 // SubscribeHandler is the handler for the main subscription topic
 func (c *Connection) SubscribeHandler(client MQTT.Client, msg MQTT.Message) {
-	s, err := subscribePayload(msg)
+	s, err := deserializePayload(msg)
 	if err != nil {
 		return
 	}

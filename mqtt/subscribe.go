@@ -28,28 +28,28 @@ import (
 
 // performAction acts on the topic and returns a response to publish back
 func performAction(s *SubscribeAction) ([]byte, error) {
+	var result PublishResponse
 	// Act based on the message action
 	switch s.Action {
+	case "list":
+		result = s.SnapList()
 	case "install":
-		r, err := s.SnapInstall()
-		if err != nil {
-			return serializeResponse(PublishResponse{ID: s.ID, Success: false, Message: err.Error()})
-		}
-		return serializeResponse(PublishResponse{ID: s.ID, Success: true, Message: r})
-
+		result = s.SnapInstall()
 	case "remove":
-		r, err := s.SnapRemove()
-		if err != nil {
-			return serializeResponse(PublishResponse{ID: s.ID, Success: false, Message: err.Error()})
-		}
-		return serializeResponse(PublishResponse{ID: s.ID, Success: true, Message: r})
+		result = s.SnapRemove()
+	case "refresh":
+		result = s.SnapRefresh()
+	case "revert":
+		result = s.SnapRevert()
 
 	default:
 		return nil, fmt.Errorf("unhandled action: %s", s.Action)
 	}
+
+	return serializeResponse(result)
 }
 
-func subscribePayload(msg MQTT.Message) (*SubscribeAction, error) {
+func deserializePayload(msg MQTT.Message) (*SubscribeAction, error) {
 	s := SubscribeAction{}
 
 	// Decode the message payload - the list of snaps

@@ -23,9 +23,10 @@ import "encoding/json"
 
 // PublishResponse is the published message showing the result of an action
 type PublishResponse struct {
-	ID      string `json:"id"`
-	Success bool   `json:"success"`
-	Message string `json:"message"`
+	ID      string      `json:"id"`
+	Success bool        `json:"success"`
+	Message string      `json:"message"`
+	Result  interface{} `json:"result"`
 }
 
 func serializeResponse(resp interface{}) ([]byte, error) {
