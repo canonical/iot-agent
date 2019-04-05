@@ -27,7 +27,7 @@ import (
 
 // SnapdClient is a client of the snapd REST API
 type SnapdClient interface {
-	//Snap(name string) (*client.Snap, *client.ResultInfo, error)
+	Snap(name string) (*client.Snap, *client.ResultInfo, error)
 	List(names []string, opts *client.ListOptions) ([]*client.Snap, error)
 	Install(name string, options *client.SnapOptions) (string, error)
 	Refresh(name string, options *client.SnapOptions) (string, error)
@@ -35,14 +35,11 @@ type SnapdClient interface {
 	Remove(name string, options *client.SnapOptions) (string, error)
 	Enable(name string, options *client.SnapOptions) (string, error)
 	Disable(name string, options *client.SnapOptions) (string, error)
-	//ServerVersion() (*client.ServerVersion, error)
-	//Ack(b []byte) error
+	ServerVersion() (*client.ServerVersion, error)
+	Ack(b []byte) error
 	Known(assertTypeName string, headers map[string]string) ([]asserts.Assertion, error)
 	Conf(name string) (map[string]interface{}, error)
 	SetConf(name string, patch map[string]interface{}) (string, error)
-	//Find(opts *client.FindOptions) ([]*client.Snap, *client.ResultInfo, error)
-	//FindOne(name string) (*client.Snap, *client.ResultInfo, error)
-	//FindSnaps(query, section string, private bool) ([]*client.Snap, *client.ResultInfo, error)
 
 	GetEncodedAssertions() ([]byte, error)
 }
@@ -66,11 +63,11 @@ func NewClientAdapter() *ClientAdapter {
 	return clientInstance
 }
 
-//// Snap returns the most recently published revision of the snap with the
-//// provided name.
-//func (a *ClientAdapter) Snap(name string) (*client.Snap, *client.ResultInfo, error) {
-//	return a.snapdClient.Snap(name)
-//}
+// Snap returns the most recently published revision of the snap with the
+// provided name.
+func (a *ClientAdapter) Snap(name string) (*client.Snap, *client.ResultInfo, error) {
+	return a.snapdClient.Snap(name)
+}
 
 // List returns the list of all snaps installed on the system
 // with names in the given list; if the list is empty, all snaps.
@@ -110,10 +107,10 @@ func (a *ClientAdapter) Disable(name string, options *client.SnapOptions) (strin
 	return a.snapdClient.Disable(name, options)
 }
 
-//// ServerVersion returns information about the snapd server.
-//func (a *ClientAdapter) ServerVersion() (*client.ServerVersion, error) {
-//	return a.snapdClient.ServerVersion()
-//}
+// ServerVersion returns information about the snapd server.
+func (a *ClientAdapter) ServerVersion() (*client.ServerVersion, error) {
+	return a.snapdClient.ServerVersion()
+}
 
 // Ack adds a new assertion to the system
 func (a *ClientAdapter) Ack(b []byte) error {
@@ -134,25 +131,3 @@ func (a *ClientAdapter) Conf(name string) (map[string]interface{}, error) {
 func (a *ClientAdapter) SetConf(name string, patch map[string]interface{}) (string, error) {
 	return a.snapdClient.SetConf(name, patch)
 }
-
-//// FindOne returns a list of snaps available for install from the
-//// store for this system and that match the query
-//func (a *ClientAdapter) FindOne(name string) (*client.Snap, *client.ResultInfo, error) {
-//	return a.snapdClient.FindOne(name)
-//}
-//
-//// Find returns a list of snaps available for install from the
-//// store for this system and that match the query
-//func (a *ClientAdapter) Find(opts *client.FindOptions) ([]*client.Snap, *client.ResultInfo, error) {
-//	return a.snapdClient.Find(opts)
-//}
-//
-//// FindSnaps is a wrapper around the Find function
-//func (a *ClientAdapter) FindSnaps(query, section string, private bool) ([]*client.Snap, *client.ResultInfo, error) {
-//	opts := &client.FindOptions{
-//		Query:   url.QueryEscape(query),
-//		Private: private,
-//		Section: section,
-//	}
-//	return a.snapdClient.Find(opts)
-//}

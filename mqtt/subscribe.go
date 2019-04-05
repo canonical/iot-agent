@@ -49,6 +49,12 @@ func performAction(s *SubscribeAction) ([]byte, error) {
 		result = s.SnapConf()
 	case "setconf":
 		result = s.SnapSetConf()
+	case "info":
+		result = s.SnapInfo()
+	case "ack":
+		result = s.SnapAck()
+	case "server":
+		result = s.SnapServerVersion()
 
 	default:
 		return nil, fmt.Errorf("unhandled action: %s", s.Action)

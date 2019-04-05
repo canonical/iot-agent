@@ -20,6 +20,7 @@
 package snapdapi
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/snapcore/snapd/asserts"
 	"github.com/snapcore/snapd/client"
@@ -81,9 +82,17 @@ Azds7xIR91OzXGFMx/PO7ZwflxBRIZw7+iFXEXWzfhzVlrUFDLr8K++g1g563UzY9P86XwGDlS7l
 // MockClient is a mock snapd API client for testing
 type MockClient struct{}
 
-//func (c *MockClient) Snap(name string) (*client.Snap, *client.ResultInfo, error) {
-//	panic("implement me")
-//}
+// Snap mocks the details of a snap
+func (c *MockClient) Snap(name string) (*client.Snap, *client.ResultInfo, error) {
+	if name == "invalid" {
+		return nil, nil, fmt.Errorf("MOCK error install")
+	}
+	return &client.Snap{
+		ID:      "1",
+		Title:   "helloworld",
+		Summary: "Welcomes the world",
+	}, &client.ResultInfo{}, nil
+}
 
 // List lists installed snaps
 func (c *MockClient) List(names []string, opts *client.ListOptions) ([]*client.Snap, error) {
@@ -144,13 +153,21 @@ func (c *MockClient) Disable(name string, options *client.SnapOptions) (string, 
 	return "105", nil
 }
 
-//func (c *MockClient) ServerVersion() (*client.ServerVersion, error) {
-//	panic("implement me")
-//}
-//
-//func (c *MockClient) Ack(b []byte) error {
-//	panic("implement me")
-//}
+// ServerVersion mocks the server version call
+func (c *MockClient) ServerVersion() (*client.ServerVersion, error) {
+	return &client.ServerVersion{
+		Version:       "1.0",
+		KernelVersion: "generic-kernel.5.0",
+	}, nil
+}
+
+// Ack mocks adding an assertion
+func (c *MockClient) Ack(b []byte) error {
+	if bytes.Equal(b, []byte("invalid")) {
+		return fmt.Errorf("MOCK error ack")
+	}
+	return nil
+}
 
 // Known returns the known assertions for a given type
 func (c *MockClient) Known(assertTypeName string, headers map[string]string) ([]asserts.Assertion, error) {
@@ -172,18 +189,6 @@ func (c *MockClient) SetConf(name string, patch map[string]interface{}) (string,
 	}
 	return "106", nil
 }
-
-//func (c *MockClient) Find(opts *client.FindOptions) ([]*client.Snap, *client.ResultInfo, error) {
-//	panic("implement me")
-//}
-//
-//func (c *MockClient) FindOne(name string) (*client.Snap, *client.ResultInfo, error) {
-//	panic("implement me")
-//}
-//
-//func (c *MockClient) FindSnaps(query, section string, private bool) ([]*client.Snap, *client.ResultInfo, error) {
-//	panic("implement me")
-//}
 
 // GetEncodedAssertions returns the encoded model and serial assertions
 func (c *MockClient) GetEncodedAssertions() ([]byte, error) {

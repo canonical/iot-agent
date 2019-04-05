@@ -57,6 +57,12 @@ func TestConnection_Workflow(t *testing.T) {
 	m10b := `{"id": "abc123", "action":"setconf"}`
 	m10c := `{"id": "abc123", "action":"setconf", "snap":"invalid", "data":"{\"title\": \"Hello World!\"}"}`
 	m10d := `{"id": "abc123", "action":"setconf", "snap":"helloworld", "data":"\u1000"}`
+	m11a := `{"id": "abc123", "action":"info", "snap":"helloworld"}`
+	m11b := `{"id": "abc123", "action":"info"}`
+	m11c := `{"id": "abc123", "action":"info", "snap":"invalid"}`
+	m12a := `{"id": "abc123", "action":"ack", "data":"serialized-assertion"}`
+	m12b := `{"id": "abc123", "action":"ack", "data":"invalid"}`
+	m13a := `{"id": "abc123", "action":"server"}`
 
 	enroll := &domain.Enrollment{
 		Credentials: domain.Credentials{
@@ -111,6 +117,15 @@ func TestConnection_Workflow(t *testing.T) {
 		{"no-snap-setconf", true, &MockMessage{[]byte(m10b)}, false, true},
 		{"invalid-setconf", true, &MockMessage{[]byte(m10c)}, false, true},
 		{"bad-data-setconf", true, &MockMessage{[]byte(m10d)}, false, true},
+
+		{"valid-info", false, &MockMessage{[]byte(m11a)}, false, false},
+		{"no-snap-info", true, &MockMessage{[]byte(m11b)}, false, true},
+		{"invalid-info", true, &MockMessage{[]byte(m11c)}, false, true},
+
+		{"valid-ack", false, &MockMessage{[]byte(m12a)}, false, false},
+		{"invalid-ack", false, &MockMessage{[]byte(m12b)}, false, true},
+
+		{"valid-server", false, &MockMessage{[]byte(m13a)}, false, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

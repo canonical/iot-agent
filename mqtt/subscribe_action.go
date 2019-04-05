@@ -166,3 +166,40 @@ func (act *SubscribeAction) SnapSetConf() PublishResponse {
 
 	return PublishResponse{ID: act.ID, Success: true, Result: result}
 }
+
+// SnapInfo gets the info for a snap
+func (act *SubscribeAction) SnapInfo() PublishResponse {
+	if len(act.Snap) == 0 {
+		return PublishResponse{ID: act.ID, Success: false, Message: "No snap name provided for snap info"}
+	}
+
+	// Call the snapd API
+	result, _, err := snapd.Snap(act.Snap)
+	if err != nil {
+		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+	}
+
+	return PublishResponse{ID: act.ID, Success: true, Result: result}
+}
+
+// SnapAck adds an assertion to the device
+func (act *SubscribeAction) SnapAck() PublishResponse {
+	// Call the snapd API
+	err := snapd.Ack([]byte(act.Data))
+	if err != nil {
+		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+	}
+
+	return PublishResponse{ID: act.ID, Success: true}
+}
+
+// SnapServerVersion gets details of the device
+func (act *SubscribeAction) SnapServerVersion() PublishResponse {
+	// Call the snapd API
+	result, err := snapd.ServerVersion()
+	if err != nil {
+		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+	}
+
+	return PublishResponse{ID: act.ID, Success: true, Result: result}
+}
