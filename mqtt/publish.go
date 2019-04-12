@@ -24,6 +24,7 @@ import "encoding/json"
 // PublishResponse is the published message showing the result of an action
 type PublishResponse struct {
 	ID      string      `json:"id"`
+	Action  string      `json:"action"`
 	Success bool        `json:"success"`
 	Message string      `json:"message"`
 	Result  interface{} `json:"result"`

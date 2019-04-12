@@ -60,6 +60,7 @@ func performAction(s *SubscribeAction) ([]byte, error) {
 		return nil, fmt.Errorf("unhandled action: %s", s.Action)
 	}
 
+	result.Action = s.Action
 	return serializeResponse(result)
 }
 

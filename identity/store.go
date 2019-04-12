@@ -21,13 +21,12 @@ package identity
 
 import (
 	"encoding/json"
-	"io/ioutil"
-
 	"github.com/CanonicalLtd/iot-identity/domain"
+	"io/ioutil"
 )
 
+// storeCredentials caches the serialized enrollment details
 func (srv *Service) storeCredentials(enroll domain.Enrollment) error {
-	// Serialize the enrollment
 	data, err := json.Marshal(&enroll)
 	if err != nil {
 		return nil
@@ -36,7 +35,7 @@ func (srv *Service) storeCredentials(enroll domain.Enrollment) error {
 	return ioutil.WriteFile(srv.Settings.CredentialsPath, data, 0600)
 }
 
-// Get enrollment
+// getCredentials fetches the cached enrollment details
 func (srv *Service) getCredentials() (*domain.Enrollment, error) {
 	enroll := &domain.Enrollment{}
 

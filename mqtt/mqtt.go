@@ -156,7 +156,7 @@ func (c *Connection) SubscribeHandler(client MQTT.Client, msg MQTT.Message) {
 	}
 
 	// The topic to publish the response to the specific action
-	t := fmt.Sprintf("devices/pub/%s/%s", c.clientID, s.ID)
+	t := fmt.Sprintf("devices/pub/%s", c.clientID)
 
 	// Perform the action
 	response, err := performAction(s)

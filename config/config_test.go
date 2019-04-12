@@ -37,6 +37,9 @@ func TestParseArgs(t *testing.T) {
 				if got.IdentityURL != DefaultIdentityURL {
 					t.Errorf("Config.ParseArgs() got = %v, want %v", got.IdentityURL, DefaultIdentityURL)
 				}
+				if got.CredentialsPath != DefaultCredentialsPath {
+					t.Errorf("Config.ParseArgs() got = %v, want %v", got.CredentialsPath, DefaultCredentialsPath)
+				}
 			}
 		})
 	}
