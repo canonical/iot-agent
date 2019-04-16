@@ -63,6 +63,7 @@ func TestConnection_Workflow(t *testing.T) {
 	m12a := `{"id": "abc123", "action":"ack", "data":"serialized-assertion"}`
 	m12b := `{"id": "abc123", "action":"ack", "data":"invalid"}`
 	m13a := `{"id": "abc123", "action":"server"}`
+	m14a := `{"id": "abc123", "action":"device"}`
 
 	enroll := &domain.Enrollment{
 		Credentials: domain.Credentials{
@@ -126,6 +127,8 @@ func TestConnection_Workflow(t *testing.T) {
 		{"invalid-ack", false, &MockMessage{[]byte(m12b)}, false, true},
 
 		{"valid-server", false, &MockMessage{[]byte(m13a)}, false, false},
+
+		{"valid-deviceinfo", false, &MockMessage{[]byte(m14a)}, false, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -153,7 +156,7 @@ func TestConnection_Workflow(t *testing.T) {
 				t.Error("TestConnection_Workflow: payload - expected error got none")
 				return
 			}
-			resp, err := performAction(sa)
+			resp, err := c.performAction(sa)
 			if err != nil && !tt.withErr {
 				t.Error("TestConnection_Workflow: action - expected error got none")
 				return

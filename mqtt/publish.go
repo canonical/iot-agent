@@ -19,7 +19,10 @@
 
 package mqtt
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"time"
+)
 
 // PublishResponse is the published message showing the result of an action
 type PublishResponse struct {
@@ -28,6 +31,24 @@ type PublishResponse struct {
 	Success bool        `json:"success"`
 	Message string      `json:"message"`
 	Result  interface{} `json:"result"`
+}
+
+// Health update contains enough details to record a device
+type Health struct {
+	OrganizationID string    `json:"orgId"`
+	DeviceID       string    `json:"deviceId"`
+	Refresh        time.Time `json:"refresh"`
+}
+
+// ActionDevice details
+type ActionDevice struct {
+	OrganizationID string `json:"orgId"`
+	DeviceID       string `json:"deviceId"`
+	Brand          string `json:"brand"`
+	Model          string `json:"model"`
+	SerialNumber   string `json:"serial"`
+	StoreID        string `json:"store"`
+	DeviceKey      string `json:"deviceKey"`
 }
 
 func serializeResponse(resp interface{}) ([]byte, error) {

@@ -22,6 +22,7 @@ package mqtt
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/json"
 	"fmt"
 	"github.com/CanonicalLtd/iot-identity/domain"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
@@ -39,8 +40,9 @@ const (
 
 // Connection for MQTT protocol
 type Connection struct {
-	client   MQTT.Client
-	clientID string
+	client         MQTT.Client
+	clientID       string
+	organisationID string
 }
 
 var conn *Connection
@@ -57,8 +59,9 @@ func GetConnection(enroll *domain.Enrollment) (*Connection, error) {
 
 		// Create a new connection
 		conn = &Connection{
-			client:   client,
-			clientID: enroll.ID,
+			client:         client,
+			clientID:       enroll.ID,
+			organisationID: enroll.Organization.ID,
 		}
 	}
 
@@ -159,7 +162,7 @@ func (c *Connection) SubscribeHandler(client MQTT.Client, msg MQTT.Message) {
 	t := fmt.Sprintf("devices/pub/%s", c.clientID)
 
 	// Perform the action
-	response, err := performAction(s)
+	response, err := c.performAction(s)
 	if err != nil {
 		log.Printf("Error with action `%s`: %v", s.Action, err)
 	}
@@ -170,12 +173,21 @@ func (c *Connection) SubscribeHandler(client MQTT.Client, msg MQTT.Message) {
 
 // Health publishes a health message to indicate that the device is still active
 func (c *Connection) Health() {
-	// Get the current time
-	timestamp := time.Now().Format(time.RFC3339)
+	// Serialize the device health details
+	h := Health{
+		OrganizationID: c.organisationID,
+		DeviceID:       c.clientID,
+		Refresh:        time.Now(),
+	}
+	data, err := json.Marshal(&h)
+	if err != nil {
+		log.Printf("Error serializing the health data: %v", err)
+		return
+	}
 
 	// The topic to publish the response to the specific action
-	t := fmt.Sprintf("devices/pub/%s/health", c.clientID)
-	c.client.Publish(t, QOSAtMostOnce, false, []byte(timestamp))
+	t := fmt.Sprintf("devices/health/%s", c.clientID)
+	c.client.Publish(t, QOSAtMostOnce, false, data)
 }
 
 // Close closes the connection to the MQTT broker

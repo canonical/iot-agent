@@ -22,11 +22,6 @@ import (
 	"github.com/CanonicalLtd/iot-agent/snapdapi"
 )
 
-// SubscribeAct is the interface for actions
-type SubscribeAct interface {
-	SnapInstall()
-}
-
 // SubscribeAction is the message format for the action topic
 type SubscribeAction struct {
 	ID     string `json:"id"`
@@ -36,6 +31,25 @@ type SubscribeAction struct {
 }
 
 var snapd snapdapi.SnapdClient = snapdapi.NewClientAdapter()
+
+// Device gets details of the device
+func (act *SubscribeAction) Device(orgID, deviceID string) PublishResponse {
+	info, err := snapd.DeviceInfo()
+	if err != nil {
+		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+	}
+
+	result := ActionDevice{
+		OrganizationID: orgID,
+		DeviceID:       deviceID,
+		Brand:          info.Brand,
+		Model:          info.Model,
+		SerialNumber:   info.SerialNumber,
+		DeviceKey:      info.DeviceKey,
+		StoreID:        info.StoreID,
+	}
+	return PublishResponse{ID: act.ID, Success: true, Result: result}
+}
 
 // SnapInstall installs a new snap
 func (act *SubscribeAction) SnapInstall() PublishResponse {

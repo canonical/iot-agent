@@ -194,3 +194,14 @@ func (c *MockClient) SetConf(name string, patch map[string]interface{}) (string,
 func (c *MockClient) GetEncodedAssertions() ([]byte, error) {
 	return []byte(fmt.Sprintf("%s\n%s", model1, serial1)), nil
 }
+
+// DeviceInfo returns a mock device details
+func (c *MockClient) DeviceInfo() (ActionDevice, error) {
+	return ActionDevice{
+		Brand:        "example",
+		Model:        "drone-1000",
+		SerialNumber: "A11111111",
+		DeviceKey:    "AAAAAAAAAA",
+		StoreID:      "example-store",
+	}, nil
+}

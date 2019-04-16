@@ -27,10 +27,12 @@ import (
 )
 
 // performAction acts on the topic and returns a response to publish back
-func performAction(s *SubscribeAction) ([]byte, error) {
+func (c *Connection) performAction(s *SubscribeAction) ([]byte, error) {
 	var result PublishResponse
 	// Act based on the message action
 	switch s.Action {
+	case "device":
+		result = s.Device(c.organisationID, c.clientID)
 	case "list":
 		result = s.SnapList()
 	case "install":

@@ -42,6 +42,7 @@ type SnapdClient interface {
 	SetConf(name string, patch map[string]interface{}) (string, error)
 
 	GetEncodedAssertions() ([]byte, error)
+	DeviceInfo() (ActionDevice, error)
 }
 
 var clientOnce sync.Once
