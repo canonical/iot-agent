@@ -22,13 +22,14 @@ package mqtt
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/CanonicalLtd/iot-devicetwin/domain"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"log"
 )
 
 // performAction acts on the topic and returns a response to publish back
 func (c *Connection) performAction(s *SubscribeAction) ([]byte, error) {
-	var result PublishResponse
+	var result domain.PublishResponse
 	// Act based on the message action
 	switch s.Action {
 	case "device":
@@ -56,7 +57,7 @@ func (c *Connection) performAction(s *SubscribeAction) ([]byte, error) {
 	case "ack":
 		result = s.SnapAck()
 	case "server":
-		result = s.SnapServerVersion()
+		result = s.SnapServerVersion(c.clientID)
 
 	default:
 		return nil, fmt.Errorf("unhandled action: %s", s.Action)
@@ -75,4 +76,8 @@ func deserializePayload(msg MQTT.Message) (*SubscribeAction, error) {
 		log.Println("Error decoding the subscribed message:", err)
 	}
 	return &s, err
+}
+
+func serializeResponse(resp interface{}) ([]byte, error) {
+	return json.Marshal(resp)
 }

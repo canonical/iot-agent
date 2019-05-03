@@ -3,13 +3,17 @@
 [![codecov][codecov-image]][codecov-url]
 # IoT Agent
 
-The IoT Agent enrolls a device with the [IoT Identity](https://github.com/CanonicalLtd/iot-identity) Service and 
+The IoT Agent enrolls a device with the [IoT Identity](https://github.com/CanonicalLtd/iot-identity) service and 
 receives credentials to access the MQTT broker. Via MQTT, it establishes communication with
-an IoT management service, so the device can be remotely monitored and managed over a
-secure connection.
+an [IoT Management](https://github.com/CanonicalLtd/iot-management) service, so the device can be remotely monitored and managed over a
+secure connection. The state of the device is mirrored in the cloud by the [IoT Device Twin](https://github.com/CanonicalLtd/iot-devicetwin) service.
 
 The agent is intended to operate on a device running Ubuntu or Ubuntu Core with snapd enabled. 
 The device management features are implemented using the snapd REST API.
+
+ ## Design
+  ![IoT Management Solution Overview](docs/IoTManagement.svg)
+  
 
 ## Build
 The project uses vendorized dependencies using govendor. Development has been done on minimum Go version 1.12.1.

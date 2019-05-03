@@ -33,16 +33,17 @@ import (
 func TestService_CheckEnrollment(t *testing.T) {
 	settings := config.ParseArgs()
 	_ = os.Remove(settings.CredentialsPath)
-	snapd := &snapdapi.MockClient{}
 	tests := []struct {
-		name    string
-		sendErr bool
-		wantErr bool
-		cleanUp bool
+		name     string
+		sendErr  bool
+		wantErr  bool
+		snapdErr bool
+		cleanUp  bool
 	}{
-		{"valid", false, false, false},
-		{"valid-secret", false, false, true},
-		{"send-error", true, true, true},
+		{"valid", false, false, false, false},
+		{"valid-secret", false, false, false, true},
+		{"send-error", true, true, false, true},
+		{"snapd-error", false, true, true, true},
 	}
 
 	for _, tt := range tests {
@@ -52,6 +53,7 @@ func TestService_CheckEnrollment(t *testing.T) {
 			} else {
 				sendPOSTRequest = mockSendRequest
 			}
+			snapd := &snapdapi.MockClient{WithError: tt.snapdErr}
 
 			srv := NewService(settings, snapd)
 			got, err := srv.CheckEnrollment()
@@ -60,7 +62,7 @@ func TestService_CheckEnrollment(t *testing.T) {
 				return
 			}
 			if !tt.wantErr {
-				if len(got.ID) == 0 {
+				if got != nil && len(got.ID) == 0 {
 					t.Error("Service.CheckEnrollment() error = empty enrollment")
 				}
 			}

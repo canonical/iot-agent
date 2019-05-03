@@ -24,6 +24,7 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
+	twin "github.com/CanonicalLtd/iot-devicetwin/domain"
 	"github.com/CanonicalLtd/iot-identity/domain"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"log"
@@ -174,7 +175,7 @@ func (c *Connection) SubscribeHandler(client MQTT.Client, msg MQTT.Message) {
 // Health publishes a health message to indicate that the device is still active
 func (c *Connection) Health() {
 	// Serialize the device health details
-	h := Health{
+	h := twin.Health{
 		OrganizationID: c.organisationID,
 		DeviceID:       c.clientID,
 		Refresh:        time.Now(),

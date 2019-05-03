@@ -22,6 +22,7 @@ package mqtt
 import (
 	"encoding/json"
 	"github.com/CanonicalLtd/iot-agent/snapdapi"
+	twin "github.com/CanonicalLtd/iot-devicetwin/domain"
 	"github.com/CanonicalLtd/iot-identity/domain"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"log"
@@ -72,66 +73,70 @@ func TestConnection_Workflow(t *testing.T) {
 		},
 	}
 	client = &MockClient{}
-	snapd = &snapdapi.MockClient{}
 	tests := []struct {
-		name    string
-		open    bool
-		message MQTT.Message
-		withErr bool
-		respErr bool
+		name     string
+		open     bool
+		message  MQTT.Message
+		snapdErr bool
+		withErr  bool
+		respErr  bool
 	}{
-		{"valid-closed", false, &MockMessage{[]byte(m1a)}, false, false},
-		{"valid-open", true, &MockMessage{[]byte(m1a)}, false, false},
-		{"no-snap", true, &MockMessage{[]byte(m1b)}, false, true},
-		{"invalid-install", true, &MockMessage{[]byte(m1c)}, false, true},
+		{"valid-closed", false, &MockMessage{[]byte(m1a)}, false, false, false},
+		{"valid-open", true, &MockMessage{[]byte(m1a)}, false, false, false},
+		{"no-snap", true, &MockMessage{[]byte(m1b)}, false, false, true},
+		{"invalid-install", true, &MockMessage{[]byte(m1c)}, false, false, true},
 
-		{"invalid-action", true, &MockMessage{[]byte(m2a)}, true, true},
-		{"bad-data", true, &MockMessage{[]byte(m2b)}, true, true},
+		{"invalid-action", true, &MockMessage{[]byte(m2a)}, false, true, true},
+		{"bad-data", true, &MockMessage{[]byte(m2b)}, false, true, true},
 
-		{"valid-remove", true, &MockMessage{[]byte(m3a)}, false, false},
-		{"no-snap-remove", true, &MockMessage{[]byte(m3b)}, false, true},
-		{"invalid-remove", true, &MockMessage{[]byte(m3c)}, false, true},
+		{"valid-remove", true, &MockMessage{[]byte(m3a)}, false, false, false},
+		{"no-snap-remove", true, &MockMessage{[]byte(m3b)}, false, false, true},
+		{"invalid-remove", true, &MockMessage{[]byte(m3c)}, false, false, true},
 
-		{"valid-refresh", true, &MockMessage{[]byte(m4a)}, false, false},
-		{"no-snap-refresh", true, &MockMessage{[]byte(m4b)}, false, true},
-		{"invalid-refresh", true, &MockMessage{[]byte(m4c)}, false, true},
+		{"valid-refresh", true, &MockMessage{[]byte(m4a)}, false, false, false},
+		{"no-snap-refresh", true, &MockMessage{[]byte(m4b)}, false, false, true},
+		{"invalid-refresh", true, &MockMessage{[]byte(m4c)}, false, false, true},
 
-		{"valid-revert", true, &MockMessage{[]byte(m5a)}, false, false},
-		{"no-snap-revert", true, &MockMessage{[]byte(m5b)}, false, true},
-		{"invalid-revert", true, &MockMessage{[]byte(m5c)}, false, true},
+		{"valid-revert", true, &MockMessage{[]byte(m5a)}, false, false, false},
+		{"no-snap-revert", true, &MockMessage{[]byte(m5b)}, false, false, true},
+		{"invalid-revert", true, &MockMessage{[]byte(m5c)}, false, false, true},
 
-		{"valid-list", true, &MockMessage{[]byte(m6a)}, false, false},
+		{"valid-list", true, &MockMessage{[]byte(m6a)}, false, false, false},
+		{"snapd-error-list", true, &MockMessage{[]byte(m6a)}, true, false, true},
 
-		{"valid-enable", true, &MockMessage{[]byte(m7a)}, false, false},
-		{"no-snap-enable", true, &MockMessage{[]byte(m7b)}, false, true},
-		{"invalid-enable", true, &MockMessage{[]byte(m7c)}, false, true},
+		{"valid-enable", true, &MockMessage{[]byte(m7a)}, false, false, false},
+		{"no-snap-enable", true, &MockMessage{[]byte(m7b)}, false, false, true},
+		{"invalid-enable", true, &MockMessage{[]byte(m7c)}, false, false, true},
 
-		{"valid-disable", true, &MockMessage{[]byte(m8a)}, false, false},
-		{"no-snap-disable", true, &MockMessage{[]byte(m8b)}, false, true},
-		{"invalid-disable", true, &MockMessage{[]byte(m8c)}, false, true},
+		{"valid-disable", true, &MockMessage{[]byte(m8a)}, false, false, false},
+		{"no-snap-disable", true, &MockMessage{[]byte(m8b)}, false, false, true},
+		{"invalid-disable", true, &MockMessage{[]byte(m8c)}, false, false, true},
 
-		{"valid-conf", true, &MockMessage{[]byte(m9a)}, false, false},
-		{"no-snap-conf", true, &MockMessage{[]byte(m9b)}, false, true},
-		{"invalid-conf", true, &MockMessage{[]byte(m9c)}, false, true},
+		{"valid-conf", true, &MockMessage{[]byte(m9a)}, false, false, false},
+		{"no-snap-conf", true, &MockMessage{[]byte(m9b)}, false, false, true},
+		{"invalid-conf", true, &MockMessage{[]byte(m9c)}, false, false, true},
 
-		{"valid-setconf", true, &MockMessage{[]byte(m10a)}, false, false},
-		{"no-snap-setconf", true, &MockMessage{[]byte(m10b)}, false, true},
-		{"invalid-setconf", true, &MockMessage{[]byte(m10c)}, false, true},
-		{"bad-data-setconf", true, &MockMessage{[]byte(m10d)}, false, true},
+		{"valid-setconf", true, &MockMessage{[]byte(m10a)}, false, false, false},
+		{"no-snap-setconf", true, &MockMessage{[]byte(m10b)}, false, false, true},
+		{"invalid-setconf", true, &MockMessage{[]byte(m10c)}, false, false, true},
+		{"bad-data-setconf", true, &MockMessage{[]byte(m10d)}, false, false, true},
 
-		{"valid-info", false, &MockMessage{[]byte(m11a)}, false, false},
-		{"no-snap-info", true, &MockMessage{[]byte(m11b)}, false, true},
-		{"invalid-info", true, &MockMessage{[]byte(m11c)}, false, true},
+		{"valid-info", false, &MockMessage{[]byte(m11a)}, false, false, false},
+		{"no-snap-info", true, &MockMessage{[]byte(m11b)}, false, false, true},
+		{"invalid-info", true, &MockMessage{[]byte(m11c)}, false, false, true},
 
-		{"valid-ack", false, &MockMessage{[]byte(m12a)}, false, false},
-		{"invalid-ack", false, &MockMessage{[]byte(m12b)}, false, true},
+		{"valid-ack", false, &MockMessage{[]byte(m12a)}, false, false, false},
+		{"invalid-ack", false, &MockMessage{[]byte(m12b)}, false, false, true},
 
-		{"valid-server", false, &MockMessage{[]byte(m13a)}, false, false},
+		{"valid-server", false, &MockMessage{[]byte(m13a)}, false, false, false},
+		{"snapd-error-server", false, &MockMessage{[]byte(m13a)}, true, false, true},
 
-		{"valid-deviceinfo", false, &MockMessage{[]byte(m14a)}, false, false},
+		{"valid-deviceinfo", false, &MockMessage{[]byte(m14a)}, false, false, false},
+		{"snapd-error-deviceinfo", false, &MockMessage{[]byte(m14a)}, true, false, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			snapd = &snapdapi.MockClient{WithError: tt.snapdErr}
 			if tt.open {
 				client.Connect()
 			}
@@ -178,8 +183,8 @@ func TestConnection_Workflow(t *testing.T) {
 	}
 }
 
-func deserializePublishResponse(data []byte) (*PublishResponse, error) {
-	s := PublishResponse{}
+func deserializePublishResponse(data []byte) (*twin.PublishResponse, error) {
+	s := twin.PublishResponse{}
 
 	// Decode the message payload - the list of snaps
 	err := json.Unmarshal(data, &s)

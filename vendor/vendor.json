@@ -3,6 +3,12 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "p51vT4Jclpc2N12MWi+ArRQf9w0=",
+			"path": "github.com/CanonicalLtd/iot-devicetwin/domain",
+			"revision": "3b233a9c75d5f17e684c8cb78fec152e6c84d856",
+			"revisionTime": "2019-05-02T16:22:03Z"
+		},
+		{
 			"checksumSHA1": "3vuyKpfI423PHtWr4eaVu24WPUc=",
 			"path": "github.com/CanonicalLtd/iot-identity/config",
 			"revision": "9f886bf5a936d8e764f2c7a1a9b6bdcb464e168c",

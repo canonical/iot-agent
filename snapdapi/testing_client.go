@@ -80,7 +80,9 @@ Azds7xIR91OzXGFMx/PO7ZwflxBRIZw7+iFXEXWzfhzVlrUFDLr8K++g1g563UzY9P86XwGDlS7l
 /PVxRaD/Ruiw0ey94zCcn3ROBEs/`
 
 // MockClient is a mock snapd API client for testing
-type MockClient struct{}
+type MockClient struct {
+	WithError bool
+}
 
 // Snap mocks the details of a snap
 func (c *MockClient) Snap(name string) (*client.Snap, *client.ResultInfo, error) {
@@ -96,6 +98,9 @@ func (c *MockClient) Snap(name string) (*client.Snap, *client.ResultInfo, error)
 
 // List lists installed snaps
 func (c *MockClient) List(names []string, opts *client.ListOptions) ([]*client.Snap, error) {
+	if c.WithError {
+		return nil, fmt.Errorf("MOCK error snap list")
+	}
 	return []*client.Snap{
 		{
 			ID:      "1",
@@ -155,6 +160,9 @@ func (c *MockClient) Disable(name string, options *client.SnapOptions) (string, 
 
 // ServerVersion mocks the server version call
 func (c *MockClient) ServerVersion() (*client.ServerVersion, error) {
+	if c.WithError {
+		return nil, fmt.Errorf("MOCK error server version")
+	}
 	return &client.ServerVersion{
 		Version:       "1.0",
 		KernelVersion: "generic-kernel.5.0",
@@ -192,11 +200,17 @@ func (c *MockClient) SetConf(name string, patch map[string]interface{}) (string,
 
 // GetEncodedAssertions returns the encoded model and serial assertions
 func (c *MockClient) GetEncodedAssertions() ([]byte, error) {
+	if c.WithError {
+		return nil, fmt.Errorf("MOCK error known")
+	}
 	return []byte(fmt.Sprintf("%s\n%s", model1, serial1)), nil
 }
 
 // DeviceInfo returns a mock device details
 func (c *MockClient) DeviceInfo() (ActionDevice, error) {
+	if c.WithError {
+		return ActionDevice{}, fmt.Errorf("MOCK error device info")
+	}
 	return ActionDevice{
 		Brand:        "example",
 		Model:        "drone-1000",

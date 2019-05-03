@@ -20,6 +20,7 @@ package mqtt
 import (
 	"encoding/json"
 	"github.com/CanonicalLtd/iot-agent/snapdapi"
+	"github.com/CanonicalLtd/iot-devicetwin/domain"
 )
 
 // SubscribeAction is the message format for the action topic
@@ -33,13 +34,14 @@ type SubscribeAction struct {
 var snapd snapdapi.SnapdClient = snapdapi.NewClientAdapter()
 
 // Device gets details of the device
-func (act *SubscribeAction) Device(orgID, deviceID string) PublishResponse {
+func (act *SubscribeAction) Device(orgID, deviceID string) domain.PublishResponse {
+	// Call the snapd API for the device information
 	info, err := snapd.DeviceInfo()
 	if err != nil {
-		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+		return domain.PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
 	}
 
-	result := ActionDevice{
+	result := domain.Device{
 		OrganizationID: orgID,
 		DeviceID:       deviceID,
 		Brand:          info.Brand,
@@ -48,172 +50,197 @@ func (act *SubscribeAction) Device(orgID, deviceID string) PublishResponse {
 		DeviceKey:      info.DeviceKey,
 		StoreID:        info.StoreID,
 	}
-	return PublishResponse{ID: act.ID, Success: true, Result: result}
+
+	// Call the snapd API for the OS version information (ignore errors)
+	version, err := act.serverVersion(deviceID)
+	if err == nil {
+		result.Version = version
+	}
+
+	return domain.PublishResponse{ID: act.ID, Success: true, Result: result}
 }
 
 // SnapInstall installs a new snap
-func (act *SubscribeAction) SnapInstall() PublishResponse {
+func (act *SubscribeAction) SnapInstall() domain.PublishResponse {
 	if len(act.Snap) == 0 {
-		return PublishResponse{ID: act.ID, Success: false, Message: "No snap name provided for install"}
+		return domain.PublishResponse{ID: act.ID, Success: false, Message: "No snap name provided for install"}
 	}
 
 	// Call the snapd API
 	result, err := snapd.Install(act.Snap, nil)
 	if err != nil {
-		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+		return domain.PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
 	}
-	return PublishResponse{ID: act.ID, Success: true, Result: result}
+	return domain.PublishResponse{ID: act.ID, Success: true, Result: result}
 }
 
 // SnapRemove removes an existing snap
-func (act *SubscribeAction) SnapRemove() PublishResponse {
+func (act *SubscribeAction) SnapRemove() domain.PublishResponse {
 	if len(act.Snap) == 0 {
-		return PublishResponse{ID: act.ID, Success: false, Message: "No snap name provided for remove"}
+		return domain.PublishResponse{ID: act.ID, Success: false, Message: "No snap name provided for remove"}
 	}
 
 	// Call the snapd API
 	result, err := snapd.Remove(act.Snap, nil)
 	if err != nil {
-		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+		return domain.PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
 	}
-	return PublishResponse{ID: act.ID, Success: true, Result: result}
+	return domain.PublishResponse{ID: act.ID, Success: true, Result: result}
 }
 
 // SnapList lists installed snaps
-func (act *SubscribeAction) SnapList() PublishResponse {
+func (act *SubscribeAction) SnapList() domain.PublishResponse {
 	// Call the snapd API
 	snaps, err := snapd.List([]string{}, nil)
 	if err != nil {
-		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+		return domain.PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
 	}
-	return PublishResponse{ID: act.ID, Success: true, Result: snaps}
+	return domain.PublishResponse{ID: act.ID, Success: true, Result: snaps}
 }
 
 // SnapRefresh refreshes an existing snap
-func (act *SubscribeAction) SnapRefresh() PublishResponse {
+func (act *SubscribeAction) SnapRefresh() domain.PublishResponse {
 	if len(act.Snap) == 0 {
-		return PublishResponse{ID: act.ID, Success: false, Message: "No snap name provided for refresh"}
+		return domain.PublishResponse{ID: act.ID, Success: false, Message: "No snap name provided for refresh"}
 	}
 
 	// Call the snapd API
 	result, err := snapd.Refresh(act.Snap, nil)
 	if err != nil {
-		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+		return domain.PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
 	}
-	return PublishResponse{ID: act.ID, Success: true, Result: result}
+	return domain.PublishResponse{ID: act.ID, Success: true, Result: result}
 }
 
 // SnapRevert reverts an existing snap
-func (act *SubscribeAction) SnapRevert() PublishResponse {
+func (act *SubscribeAction) SnapRevert() domain.PublishResponse {
 	if len(act.Snap) == 0 {
-		return PublishResponse{ID: act.ID, Success: false, Message: "No snap name provided for revert"}
+		return domain.PublishResponse{ID: act.ID, Success: false, Message: "No snap name provided for revert"}
 	}
 
 	// Call the snapd API
 	result, err := snapd.Revert(act.Snap, nil)
 	if err != nil {
-		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+		return domain.PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
 	}
-	return PublishResponse{ID: act.ID, Success: true, Result: result}
+	return domain.PublishResponse{ID: act.ID, Success: true, Result: result}
 }
 
 // SnapEnable enables an existing snap
-func (act *SubscribeAction) SnapEnable() PublishResponse {
+func (act *SubscribeAction) SnapEnable() domain.PublishResponse {
 	if len(act.Snap) == 0 {
-		return PublishResponse{ID: act.ID, Success: false, Message: "No snap name provided for enable"}
+		return domain.PublishResponse{ID: act.ID, Success: false, Message: "No snap name provided for enable"}
 	}
 
 	// Call the snapd API
 	result, err := snapd.Enable(act.Snap, nil)
 	if err != nil {
-		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+		return domain.PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
 	}
-	return PublishResponse{ID: act.ID, Success: true, Result: result}
+	return domain.PublishResponse{ID: act.ID, Success: true, Result: result}
 }
 
 // SnapDisable disables an existing snap
-func (act *SubscribeAction) SnapDisable() PublishResponse {
+func (act *SubscribeAction) SnapDisable() domain.PublishResponse {
 	if len(act.Snap) == 0 {
-		return PublishResponse{ID: act.ID, Success: false, Message: "No snap name provided for disable"}
+		return domain.PublishResponse{ID: act.ID, Success: false, Message: "No snap name provided for disable"}
 	}
 
 	// Call the snapd API
 	result, err := snapd.Disable(act.Snap, nil)
 	if err != nil {
-		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+		return domain.PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
 	}
-	return PublishResponse{ID: act.ID, Success: true, Result: result}
+	return domain.PublishResponse{ID: act.ID, Success: true, Result: result}
 }
 
 // SnapConf gets the config for a snap
-func (act *SubscribeAction) SnapConf() PublishResponse {
+func (act *SubscribeAction) SnapConf() domain.PublishResponse {
 	if len(act.Snap) == 0 {
-		return PublishResponse{ID: act.ID, Success: false, Message: "No snap name provided for config"}
+		return domain.PublishResponse{ID: act.ID, Success: false, Message: "No snap name provided for config"}
 	}
 
 	// Call the snapd API
 	result, err := snapd.Conf(act.Snap)
 	if err != nil {
-		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+		return domain.PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
 	}
 
-	return PublishResponse{ID: act.ID, Success: true, Result: result}
+	return domain.PublishResponse{ID: act.ID, Success: true, Result: result}
 }
 
 // SnapSetConf sets the config for a snap
-func (act *SubscribeAction) SnapSetConf() PublishResponse {
+func (act *SubscribeAction) SnapSetConf() domain.PublishResponse {
 	if len(act.Snap) == 0 {
-		return PublishResponse{ID: act.ID, Success: false, Message: "No snap name provided for set config"}
+		return domain.PublishResponse{ID: act.ID, Success: false, Message: "No snap name provided for set config"}
 	}
 
 	// Deserialize the settings
 	var data map[string]interface{}
 	if err := json.Unmarshal([]byte(act.Data), &data); err != nil {
-		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+		return domain.PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
 	}
 
 	// Call the snapd API
 	result, err := snapd.SetConf(act.Snap, data)
 	if err != nil {
-		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+		return domain.PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
 	}
 
-	return PublishResponse{ID: act.ID, Success: true, Result: result}
+	return domain.PublishResponse{ID: act.ID, Success: true, Result: result}
 }
 
 // SnapInfo gets the info for a snap
-func (act *SubscribeAction) SnapInfo() PublishResponse {
+func (act *SubscribeAction) SnapInfo() domain.PublishResponse {
 	if len(act.Snap) == 0 {
-		return PublishResponse{ID: act.ID, Success: false, Message: "No snap name provided for snap info"}
+		return domain.PublishResponse{ID: act.ID, Success: false, Message: "No snap name provided for snap info"}
 	}
 
 	// Call the snapd API
 	result, _, err := snapd.Snap(act.Snap)
 	if err != nil {
-		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+		return domain.PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
 	}
 
-	return PublishResponse{ID: act.ID, Success: true, Result: result}
+	return domain.PublishResponse{ID: act.ID, Success: true, Result: result}
 }
 
 // SnapAck adds an assertion to the device
-func (act *SubscribeAction) SnapAck() PublishResponse {
+func (act *SubscribeAction) SnapAck() domain.PublishResponse {
 	// Call the snapd API
 	err := snapd.Ack([]byte(act.Data))
 	if err != nil {
-		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+		return domain.PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
 	}
 
-	return PublishResponse{ID: act.ID, Success: true}
+	return domain.PublishResponse{ID: act.ID, Success: true}
 }
 
 // SnapServerVersion gets details of the device
-func (act *SubscribeAction) SnapServerVersion() PublishResponse {
+func (act *SubscribeAction) SnapServerVersion(deviceID string) domain.PublishResponse {
 	// Call the snapd API
-	result, err := snapd.ServerVersion()
+	result, err := act.serverVersion(deviceID)
 	if err != nil {
-		return PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
+		return domain.PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
 	}
 
-	return PublishResponse{ID: act.ID, Success: true, Result: result}
+	return domain.PublishResponse{ID: act.ID, Success: true, Result: result}
+}
+
+func (act *SubscribeAction) serverVersion(deviceID string) (domain.DeviceVersion, error) {
+	// Call the snapd API
+	version, err := snapd.ServerVersion()
+	if err != nil {
+		return domain.DeviceVersion{}, err
+	}
+
+	return domain.DeviceVersion{
+		DeviceID:      deviceID,
+		Version:       version.Version,
+		Series:        version.Series,
+		OSID:          version.OSID,
+		OSVersionID:   version.OSVersionID,
+		OnClassic:     version.OnClassic,
+		KernelVersion: version.KernelVersion,
+	}, nil
 }
