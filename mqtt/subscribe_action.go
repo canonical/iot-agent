@@ -89,13 +89,43 @@ func (act *SubscribeAction) SnapRemove() domain.PublishResponse {
 }
 
 // SnapList lists installed snaps
-func (act *SubscribeAction) SnapList() domain.PublishResponse {
+func (act *SubscribeAction) SnapList(deviceID string) domain.PublishResponse {
 	// Call the snapd API
 	snaps, err := snapd.List([]string{}, nil)
 	if err != nil {
 		return domain.PublishResponse{ID: act.ID, Success: false, Message: err.Error()}
 	}
-	return domain.PublishResponse{ID: act.ID, Success: true, Result: snaps}
+
+	// Convert the snaps into the device twin format
+	ss := []domain.DeviceSnap{}
+
+	for _, s := range snaps {
+		// Get the config for the snap (ignore errors)
+		var conf string
+		c, err := snapd.Conf(act.Snap)
+		if err == nil {
+			resp, err := serializeResponse(c)
+			if err == nil {
+				conf = string(resp)
+			}
+		}
+
+		ss = append(ss, domain.DeviceSnap{
+			DeviceID:      deviceID,
+			Name:          s.Name,
+			InstalledSize: s.InstalledSize,
+			InstalledDate: s.InstallDate,
+			Status:        s.Status,
+			Channel:       s.Channel,
+			Confinement:   s.Confinement,
+			Version:       s.Version,
+			Revision:      s.Revision.N,
+			Devmode:       s.DevMode,
+			Config:        conf,
+		})
+	}
+
+	return domain.PublishResponse{ID: act.ID, Success: true, Result: ss}
 }
 
 // SnapRefresh refreshes an existing snap

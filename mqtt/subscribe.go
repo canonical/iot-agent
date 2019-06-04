@@ -35,7 +35,7 @@ func (c *Connection) performAction(s *SubscribeAction) ([]byte, error) {
 	case "device":
 		result = s.Device(c.organisationID, c.clientID)
 	case "list":
-		result = s.SnapList()
+		result = s.SnapList(c.clientID)
 	case "install":
 		result = s.SnapInstall()
 	case "remove":
