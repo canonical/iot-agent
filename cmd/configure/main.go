@@ -27,8 +27,12 @@ import (
 )
 
 func main() {
-	var url string
+	var (
+		url       string
+		credsPath string
+	)
 	flag.StringVar(&url, "url", config.DefaultIdentityURL, "The URL of the Identity Service")
+	flag.StringVar(&credsPath, "path", config.GetPath(config.DefaultCredentialsPath), "The full path to the credentials file")
 	flag.Parse()
 
 	// Store the URL (let the other parameters be defaulted)

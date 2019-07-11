@@ -42,8 +42,8 @@ parts:
       go install ./...
 
       mkdir -p $SNAPCRAFT_PART_INSTALL/bin
-      cp $GOBIN/agent $SNAPCRAFT_PART_INSTALL/bin
-      cp $GOBIN/configure $SNAPCRAFT_PART_INSTALL/configure
+      cp $GOBIN/agent $SNAPCRAFT_PART_INSTALL/bin/
+      cp $GOBIN/configure $SNAPCRAFT_PART_INSTALL/bin/
     build-packages:
       - git
       - gcc

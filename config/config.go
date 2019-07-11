@@ -48,15 +48,15 @@ var Config Settings
 func ReadParameters() *Settings {
 	Config = Settings{
 		IdentityURL:     DefaultIdentityURL,
-		CredentialsPath: getPath(DefaultCredentialsPath),
+		CredentialsPath: GetPath(DefaultCredentialsPath),
 	}
 
-	path := getPath(paramsFilename)
+	p := GetPath(paramsFilename)
 
-	dat, err := ioutil.ReadFile(path)
+	dat, err := ioutil.ReadFile(p)
 	if err != nil {
 		log.Printf("Error reading config parameters: %v", err)
-		StoreParameters(Config)
+		_ = StoreParameters(Config)
 		return &Config
 	}
 
@@ -71,18 +71,18 @@ func ReadParameters() *Settings {
 
 // StoreParameters stores the configuration parameters on the filesystem
 func StoreParameters(c Settings) error {
-	path := getPath(paramsFilename)
+	p := GetPath(paramsFilename)
 
 	// Default empty parameters
 	if len(c.IdentityURL) == 0 {
 		c.IdentityURL = DefaultIdentityURL
 	}
 	if len(c.CredentialsPath) == 0 {
-		c.CredentialsPath = getPath(DefaultCredentialsPath)
+		c.CredentialsPath = GetPath(DefaultCredentialsPath)
 	}
 
 	// Create the output file
-	f, err := os.Create(path)
+	f, err := os.Create(p)
 	if err != nil {
 		return err
 	}
@@ -101,13 +101,17 @@ func StoreParameters(c Settings) error {
 		log.Printf("Error storing config parameters: %v", err)
 		return err
 	}
-	f.Sync()
+	_ = f.Sync()
 
 	// Restrict access to the file
-	err = os.Chmod(path, 0600)
+	err = os.Chmod(p, 0600)
 	return nil
 }
 
-func getPath(filename string) string {
-	return path.Join(os.Getenv(paramsEnvVar), filename)
+// GetPath returns the full path to the data file
+func GetPath(filename string) string {
+	if len(os.Getenv(paramsEnvVar)) > 0 {
+		return path.Join(os.Getenv(paramsEnvVar), "../current", filename)
+	}
+	return filename
 }
