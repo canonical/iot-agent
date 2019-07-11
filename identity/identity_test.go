@@ -31,8 +31,9 @@ import (
 )
 
 func TestService_CheckEnrollment(t *testing.T) {
-	settings := config.ParseArgs()
+	settings := config.ReadParameters()
 	_ = os.Remove(settings.CredentialsPath)
+	_ = os.Remove("params")
 	tests := []struct {
 		name     string
 		sendErr  bool
@@ -70,6 +71,7 @@ func TestService_CheckEnrollment(t *testing.T) {
 			// Clean up
 			if tt.cleanUp {
 				_ = os.Remove(settings.CredentialsPath)
+				_ = os.Remove("params")
 			}
 		})
 	}

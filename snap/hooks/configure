@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Get the parameters from the snap settings
+url=$(snapctl get url)
+
+# Store the credentials
+cd $SNAP
+bin/configure -url $url
+
+# Restart the service
+snapctl restart ${SNAP_NAME}.mqtt

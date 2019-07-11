@@ -37,7 +37,7 @@ func main() {
 	log.Println("Starting IoT agent")
 
 	// Set up the dependency chain
-	settings := config.ParseArgs()
+	settings := config.ReadParameters()
 	snap := snapdapi.NewClientAdapter()
 
 	defer mqttConn.Close()

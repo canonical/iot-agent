@@ -4,3 +4,4 @@ vendor/*/
 .secret
 main
 .coverage/
+*.snap

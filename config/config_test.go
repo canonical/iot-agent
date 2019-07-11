@@ -20,10 +20,11 @@
 package config
 
 import (
+	"os"
 	"testing"
 )
 
-func TestParseArgs(t *testing.T) {
+func TestReadParameters(t *testing.T) {
 	tests := []struct {
 		name string
 	}{
@@ -31,16 +32,44 @@ func TestParseArgs(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			{
-				got := ParseArgs()
+				got := ReadParameters()
 				if got.IdentityURL != DefaultIdentityURL {
-					t.Errorf("Config.ParseArgs() got = %v, want %v", got.IdentityURL, DefaultIdentityURL)
+					t.Errorf("Config.ReadParameters() got = %v, want %v", got.IdentityURL, DefaultIdentityURL)
 				}
 				if got.CredentialsPath != DefaultCredentialsPath {
-					t.Errorf("Config.ParseArgs() got = %v, want %v", got.CredentialsPath, DefaultCredentialsPath)
+					t.Errorf("Config.ReadParameters() got = %v, want %v", got.CredentialsPath, DefaultCredentialsPath)
 				}
+
+				_ = os.Remove(paramsFilename)
 			}
+		})
+	}
+}
+
+func TestStoreParameters(t *testing.T) {
+	tests := []struct {
+		name    string
+		args    Settings
+		wantErr bool
+	}{
+		{"valid", Settings{}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := StoreParameters(tt.args); (err != nil) != tt.wantErr {
+				t.Errorf("StoreParameters() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			got := ReadParameters()
+			if got.IdentityURL != DefaultIdentityURL {
+				t.Errorf("Config.ReadParameters() got = %v, want %v", got.IdentityURL, DefaultIdentityURL)
+			}
+			if got.CredentialsPath != DefaultCredentialsPath {
+				t.Errorf("Config.ReadParameters() got = %v, want %v", got.CredentialsPath, DefaultCredentialsPath)
+			}
+
+			_ = os.Remove(paramsFilename)
 		})
 	}
 }

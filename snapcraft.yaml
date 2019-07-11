@@ -1,0 +1,49 @@
+name: iot-agent
+version: "0.1"
+summary: IoT Device Management Agent using MQTT
+description: |
+  The IoT Agent enrolls a device with the IoT Identity service and receives credentials to access the MQTT broker.
+  Via MQTT, it establishes communication with an IoT Management service, so the device can be remotely monitored and managed over a
+  secure connection.
+
+  The agent is intended to operate on a device running Ubuntu or Ubuntu Core with snapd enabled.
+  The device management features are implemented using the snapd REST API.
+confinement: strict
+grade: stable
+base: core18
+
+apps:
+  mqtt:
+    command: agent
+    daemon: simple
+    plugs:
+      - network
+      - network-bind
+      #- snapd-control    # it needs these privileged interfaces
+      #- shutdown         # but they trigger a manual store review
+
+parts:
+  go:
+    plugin: nil
+    source-tag: go1.12.1
+    source-depth: 1
+  client:
+    plugin: go
+    after: [go]
+    source: .
+    go-importpath: github.com/CanonicalLtd/iot-agent
+    override-build: |
+      export GOPATH=$(cd ../go && pwd)
+      GOBIN=$GOPATH/bin
+      PKG=github.com/CanonicalLtd/iot-agent
+      mkdir -p $GOBIN
+      cd $GOPATH/src/$PKG
+      ./get-deps.sh
+      go install ./...
+
+      mkdir -p $SNAPCRAFT_PART_INSTALL/bin
+      cp $GOBIN/agent $SNAPCRAFT_PART_INSTALL/bin
+      cp $GOBIN/configure $SNAPCRAFT_PART_INSTALL/configure
+    build-packages:
+      - git
+      - gcc

@@ -19,32 +19,95 @@
 
 package config
 
-import "flag"
+import (
+	"encoding/json"
+	"io/ioutil"
+	"log"
+	"os"
+	"path"
+)
 
-// Default settings
+// Default parameters
 const (
 	DefaultIdentityURL     = "http://localhost:8030/"
 	DefaultCredentialsPath = ".secret"
+	paramsEnvVar           = "SNAP_DATA"
+	paramsFilename         = "params"
 )
 
 // Settings defines the application configuration
 type Settings struct {
-	IdentityURL     string
-	CredentialsPath string
+	IdentityURL     string `json:"url"`
+	CredentialsPath string `json:"path"`
 }
 
-// ParseArgs checks the command line arguments
-func ParseArgs() *Settings {
-	var (
-		url      string
-		credPath string
-	)
-	flag.StringVar(&url, "url", DefaultIdentityURL, "The URL of the Identity Service")
-	flag.StringVar(&credPath, "credentials", DefaultCredentialsPath, "The full path to the credentials file")
-	flag.Parse()
+// Config holds the config parameters for the application
+var Config Settings
 
-	return &Settings{
-		IdentityURL:     url,
-		CredentialsPath: credPath,
+// ReadParameters fetches the store config parameters
+func ReadParameters() *Settings {
+	Config = Settings{
+		IdentityURL:     DefaultIdentityURL,
+		CredentialsPath: getPath(DefaultCredentialsPath),
 	}
+
+	path := getPath(paramsFilename)
+
+	dat, err := ioutil.ReadFile(path)
+	if err != nil {
+		log.Printf("Error reading config parameters: %v", err)
+		StoreParameters(Config)
+		return &Config
+	}
+
+	err = json.Unmarshal(dat, &Config)
+	if err != nil {
+		log.Printf("Error parsing config parameters: %v", err)
+		return &Config
+	}
+
+	return &Config
+}
+
+// StoreParameters stores the configuration parameters on the filesystem
+func StoreParameters(c Settings) error {
+	path := getPath(paramsFilename)
+
+	// Default empty parameters
+	if len(c.IdentityURL) == 0 {
+		c.IdentityURL = DefaultIdentityURL
+	}
+	if len(c.CredentialsPath) == 0 {
+		c.CredentialsPath = getPath(DefaultCredentialsPath)
+	}
+
+	// Create the output file
+	f, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	// Convert the parameters to JSON
+	b, err := json.Marshal(c)
+	if err != nil {
+		log.Printf("Error marshalling config parameters: %v", err)
+		return err
+	}
+
+	// Output the JSON to the file
+	_, err = f.Write(b)
+	if err != nil {
+		log.Printf("Error storing config parameters: %v", err)
+		return err
+	}
+	f.Sync()
+
+	// Restrict access to the file
+	err = os.Chmod(path, 0600)
+	return nil
+}
+
+func getPath(filename string) string {
+	return path.Join(os.Getenv(paramsEnvVar), filename)
 }
