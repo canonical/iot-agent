@@ -104,8 +104,7 @@ func StoreParameters(c Settings) error {
 	_ = f.Sync()
 
 	// Restrict access to the file
-	err = os.Chmod(p, 0600)
-	return nil
+	return os.Chmod(p, 0600)
 }
 
 // GetPath returns the full path to the data file
