@@ -261,6 +261,12 @@
 			"revisionTime": "2019-04-01T07:06:21Z"
 		},
 		{
+			"checksumSHA1": "9gypWnVZJEaH3jMK9KqOp4xgQD4=",
+			"path": "gopkg.in/check.v1",
+			"revision": "788fd78401277ebd861206a03c884797c6ec5541",
+			"revisionTime": "2018-06-28T17:31:08Z"
+		},
+		{
 			"checksumSHA1": "t95/FNK2nGCx3e6IARbO7OrcCuY=",
 			"path": "gopkg.in/tomb.v2",
 			"revision": "d5d1b5820637886def9eef33e03a27a9f166942c",
