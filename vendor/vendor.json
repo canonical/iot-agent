@@ -63,6 +63,18 @@
 			"revisionTime": "2019-03-16T13:32:43Z"
 		},
 		{
+			"checksumSHA1": "3ohk4dFYrERZ6WTdKkIwnTA0HSI=",
+			"path": "github.com/kr/pretty",
+			"revision": "73f6ac0b30a98e433b289500d779f50c1a6f0712",
+			"revisionTime": "2018-05-06T08:33:45Z"
+		},
+		{
+			"checksumSHA1": "SbguDK5lY8uhaHNrmJmNbiWIGM0=",
+			"path": "github.com/kr/text",
+			"revision": "e2ffdb16a802fe2bb95e2e35ff34f0e53aeef34f",
+			"revisionTime": "2018-05-06T08:24:08Z"
+		},
+		{
 			"checksumSHA1": "nV76VgoCpwa+JjK/tSyu5jCj8HQ=",
 			"path": "github.com/ojii/gettext.go",
 			"revision": "b6dae1d7af8a8441285e42661565760b530a8a57",
