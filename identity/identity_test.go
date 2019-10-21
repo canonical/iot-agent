@@ -46,7 +46,7 @@ func TestService_CheckEnrollment(t *testing.T) {
 		{"valid-secret", false, false, false, true, false},
 		{"send-error", true, true, false, true, false},
 		{"snapd-error", false, true, true, true, false},
-		{"valid-device-data", false, false, false, false, true},
+		{"valid-device-data", false, false, false, true, true},
 	}
 
 	for _, tt := range tests {
@@ -76,6 +76,7 @@ func TestService_CheckEnrollment(t *testing.T) {
 			if tt.cleanUp {
 				_ = os.Remove(settings.CredentialsPath)
 				_ = os.Remove("params")
+				_ = os.Remove("device-data.bin")
 			}
 		})
 	}
