@@ -35,22 +35,26 @@ func TestService_CheckEnrollment(t *testing.T) {
 	_ = os.Remove(settings.CredentialsPath)
 	_ = os.Remove("params")
 	tests := []struct {
-		name     string
-		sendErr  bool
-		wantErr  bool
-		snapdErr bool
-		cleanUp  bool
+		name           string
+		sendErr        bool
+		wantErr        bool
+		snapdErr       bool
+		cleanUp        bool
+		withDeviceData bool
 	}{
-		{"valid", false, false, false, false},
-		{"valid-secret", false, false, false, true},
-		{"send-error", true, true, false, true},
-		{"snapd-error", false, true, true, true},
+		{"valid", false, false, false, false, false},
+		{"valid-secret", false, false, false, true, false},
+		{"send-error", true, true, false, true, false},
+		{"snapd-error", false, true, true, true, false},
+		{"valid-device-data", false, false, false, true, true},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.sendErr {
 				sendPOSTRequest = mockSendRequestError
+			} else if tt.withDeviceData {
+				sendPOSTRequest = mockSendDeviceData
 			} else {
 				sendPOSTRequest = mockSendRequest
 			}
@@ -72,6 +76,7 @@ func TestService_CheckEnrollment(t *testing.T) {
 			if tt.cleanUp {
 				_ = os.Remove(settings.CredentialsPath)
 				_ = os.Remove("params")
+				_ = os.Remove("device-data.bin")
 			}
 		})
 	}
@@ -79,6 +84,13 @@ func TestService_CheckEnrollment(t *testing.T) {
 
 func mockSendRequest(u string, data []byte) (*web.EnrollResponse, error) {
 	const resp = `{"enrollment": {"id":"abc123"}}`
+
+	return parseEnrollResponse(strings.NewReader(resp))
+}
+
+func mockSendDeviceData(u string, data []byte) (*web.EnrollResponse, error) {
+	// deviceData=encode('Hello base 64 world')
+	const resp = `{"enrollment": {"id":"abc123","deviceData":"SGVsbG8gYmFzZSA2NCB3b3JsZA=="}}`
 
 	return parseEnrollResponse(strings.NewReader(resp))
 }

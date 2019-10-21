@@ -21,11 +21,14 @@ package identity
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 	"path"
 
 	"github.com/CanonicalLtd/iot-agent/config"
@@ -34,7 +37,12 @@ import (
 	"github.com/CanonicalLtd/iot-identity/web"
 )
 
-const mediaType = "application/x.ubuntu.assertion"
+// Default parameters
+const (
+	mediaType          = "application/x.ubuntu.assertion"
+	commonDataEnvVar   = "SNAP_COMMON"
+	deviceDataFileName = "device-data.bin"
+)
 
 // UseCase is the interface for the identity service use cases
 type UseCase interface {
@@ -84,8 +92,33 @@ func (srv *Service) enrollDevice() (*domain.Enrollment, error) {
 
 	// Store the enrollment credentials
 	err = srv.storeCredentials(resp.Enrollment)
+	if err != nil {
+		return nil, err
+	}
+
+	// Store device data in a separate file
+	if len(resp.Enrollment.DeviceData) != 0 {
+		err = storeDeviceData(resp.Enrollment.DeviceData)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	return &resp.Enrollment, err
+}
+
+func storeDeviceData(dataBase64 string) error {
+	data, err := base64.StdEncoding.DecodeString(dataBase64)
+	if err != nil {
+		return fmt.Errorf("cannot decode device data: %v", err)
+	}
+
+	err = ioutil.WriteFile(path.Join(os.Getenv(commonDataEnvVar), deviceDataFileName), data, 0600)
+	if err != nil {
+		return fmt.Errorf("cannot write device data: %v", err)
+	}
+
+	return nil
 }
 
 func sendEnrollmentRequest(idURL string, data []byte) (*web.EnrollResponse, error) {
