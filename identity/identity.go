@@ -97,7 +97,7 @@ func (srv *Service) enrollDevice() (*domain.Enrollment, error) {
 	}
 
 	// Store device data in a separate file
-	if resp.Enrollment.DeviceData != "" {
+	if len(resp.Enrollment.DeviceData) != 0 {
 		err = storeDeviceData(resp.Enrollment.DeviceData)
 		if err != nil {
 			return nil, err
@@ -110,12 +110,12 @@ func (srv *Service) enrollDevice() (*domain.Enrollment, error) {
 func storeDeviceData(dataBase64 string) error {
 	data, err := base64.StdEncoding.DecodeString(dataBase64)
 	if err != nil {
-		return fmt.Errorf("Cannot decode device data: %v", err)
+		return fmt.Errorf("cannot decode device data: %v", err)
 	}
 
 	err = ioutil.WriteFile(path.Join(os.Getenv(commonDataEnvVar), deviceDataFileName), data, 0600)
 	if err != nil {
-		return fmt.Errorf("Cannot write device data: %v", err)
+		return fmt.Errorf("cannot write device data: %v", err)
 	}
 
 	return nil
