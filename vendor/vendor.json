@@ -11,38 +11,38 @@
 		{
 			"checksumSHA1": "RlRObmPP49Zrs5LOcG6RsmJPqUw=",
 			"path": "github.com/CanonicalLtd/iot-identity/config",
-			"revision": "c4113019316a5b4a7ae043bb85e9ec217069e14d",
-			"revisionTime": "2019-10-18T16:35:05Z"
+			"revision": "0c941ffb83a1207565ba2715d2cbf8f98320e7fd",
+			"revisionTime": "2019-10-21T10:43:51Z"
 		},
 		{
 			"checksumSHA1": "eTAFZduQzX1z1rKOR/Pp6se3WPY=",
 			"path": "github.com/CanonicalLtd/iot-identity/datastore",
-			"revision": "c4113019316a5b4a7ae043bb85e9ec217069e14d",
-			"revisionTime": "2019-10-18T16:35:05Z"
+			"revision": "0c941ffb83a1207565ba2715d2cbf8f98320e7fd",
+			"revisionTime": "2019-10-21T10:43:51Z"
 		},
 		{
 			"checksumSHA1": "wlagYTYWkV7rMKVWIm5BPcrZ4rU=",
 			"path": "github.com/CanonicalLtd/iot-identity/domain",
-			"revision": "c4113019316a5b4a7ae043bb85e9ec217069e14d",
-			"revisionTime": "2019-10-18T16:35:05Z"
+			"revision": "0c941ffb83a1207565ba2715d2cbf8f98320e7fd",
+			"revisionTime": "2019-10-21T10:43:51Z"
 		},
 		{
 			"checksumSHA1": "gQkm+V2u6GUtTNtS9ZdyKj93yH4=",
 			"path": "github.com/CanonicalLtd/iot-identity/service",
-			"revision": "c4113019316a5b4a7ae043bb85e9ec217069e14d",
-			"revisionTime": "2019-10-18T16:35:05Z"
+			"revision": "0c941ffb83a1207565ba2715d2cbf8f98320e7fd",
+			"revisionTime": "2019-10-21T10:43:51Z"
 		},
 		{
 			"checksumSHA1": "f/w+3kuasJir1CQCf8WBAfNDur0=",
 			"path": "github.com/CanonicalLtd/iot-identity/service/cert",
-			"revision": "c4113019316a5b4a7ae043bb85e9ec217069e14d",
-			"revisionTime": "2019-10-18T16:35:05Z"
+			"revision": "0c941ffb83a1207565ba2715d2cbf8f98320e7fd",
+			"revisionTime": "2019-10-21T10:43:51Z"
 		},
 		{
 			"checksumSHA1": "xq9hbGV+ueGQjOUYLnkGKtAHqKI=",
 			"path": "github.com/CanonicalLtd/iot-identity/web",
-			"revision": "c4113019316a5b4a7ae043bb85e9ec217069e14d",
-			"revisionTime": "2019-10-18T16:35:05Z"
+			"revision": "0c941ffb83a1207565ba2715d2cbf8f98320e7fd",
+			"revisionTime": "2019-10-21T10:43:51Z"
 		},
 		{
 			"checksumSHA1": "9QgiN0DiZ4wHg05u61OG8QPSCm8=",
@@ -73,6 +73,12 @@
 			"path": "github.com/ojii/gettext.go/pluralforms",
 			"revision": "b6dae1d7af8a8441285e42661565760b530a8a57",
 			"revisionTime": "2017-01-20T06:14:37Z"
+		},
+		{
+			"checksumSHA1": "ll+Va3U8P37U3saPXZW7f5B3RmY=",
+			"path": "github.com/segmentio/ksuid",
+			"revision": "9349bd0a1b74d652f56881a2418e4b8d5df19321",
+			"revisionTime": "2019-06-23T19:50:11Z"
 		},
 		{
 			"checksumSHA1": "xYIWqNSFWyM3pbZ2TufUqmr+0Qo=",
