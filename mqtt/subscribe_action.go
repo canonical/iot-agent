@@ -102,7 +102,7 @@ func (act *SubscribeAction) SnapList(deviceID string) domain.PublishResponse {
 	for _, s := range snaps {
 		// Get the config for the snap (ignore errors)
 		var conf string
-		c, err := snapd.Conf(act.Snap)
+		c, err := snapd.Conf(s.Name)
 		if err == nil {
 			resp, err := serializeResponse(c)
 			if err == nil {

@@ -1,6 +1,7 @@
 [![Build Status][travis-image]][travis-url]
 [![Go Report Card][goreportcard-image]][goreportcard-url]
 [![codecov][codecov-image]][codecov-url]
+[![Snap Status](https://build.snapcraft.io/badge/CanonicalLtd/iot-agent.svg)](https://build.snapcraft.io/user/CanonicalLtd/iot-agent)
 # IoT Agent
 
 The IoT Agent enrolls a device with the [IoT Identity](https://github.com/CanonicalLtd/iot-identity) service and 
@@ -11,7 +12,6 @@ secure connection. The state of the device is mirrored in the cloud by the [IoT 
 The agent is intended to operate on a device running Ubuntu or Ubuntu Core with snapd enabled. 
 The device management features are implemented using the snapd REST API.
 
- ## Design
   ![IoT Management Solution Overview](docs/IoTManagement.svg)
   
 
