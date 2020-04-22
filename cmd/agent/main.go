@@ -60,8 +60,9 @@ func main() {
 			continue
 		}
 
-		// Publish the health check message
+		// Publish the health check and metrics messages
 		mqttConn.Health()
+		mqttConn.Metrics()
 	}
 	ticker.Stop()
 }
