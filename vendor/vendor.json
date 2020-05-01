@@ -45,6 +45,12 @@
 			"revisionTime": "2019-10-21T10:43:51Z"
 		},
 		{
+			"checksumSHA1": "+uOjgDmeVWUwUI9l/AVZGa6+yQs=",
+			"path": "github.com/StackExchange/wmi",
+			"revision": "cbe66965904dbe8a6cd589e2298e5d8b986bd7dd",
+			"revisionTime": "2019-05-23T21:33:15Z"
+		},
+		{
 			"checksumSHA1": "9QgiN0DiZ4wHg05u61OG8QPSCm8=",
 			"path": "github.com/eclipse/paho.mqtt.golang",
 			"revision": "20337d8c394721c308cc6ec096990ee451a7cd7f",
@@ -55,6 +61,18 @@
 			"path": "github.com/eclipse/paho.mqtt.golang/packets",
 			"revision": "20337d8c394721c308cc6ec096990ee451a7cd7f",
 			"revisionTime": "2019-03-22T15:20:51Z"
+		},
+		{
+			"checksumSHA1": "6Npyd/H9celLWIV9farP7DBxHNE=",
+			"path": "github.com/go-ole/go-ole",
+			"revision": "14974a1cf6477f616180232977d8ab4791ea8820",
+			"revisionTime": "2019-09-20T10:46:07Z"
+		},
+		{
+			"checksumSHA1": "PArleDBtadu2qO4hJwHR8a3IOTA=",
+			"path": "github.com/go-ole/go-ole/oleutil",
+			"revision": "14974a1cf6477f616180232977d8ab4791ea8820",
+			"revisionTime": "2019-09-20T10:46:07Z"
 		},
 		{
 			"checksumSHA1": "WgzN84Tx+7en7p/e8gSTupIqygw=",
@@ -79,6 +97,24 @@
 			"path": "github.com/segmentio/ksuid",
 			"revision": "9349bd0a1b74d652f56881a2418e4b8d5df19321",
 			"revisionTime": "2019-06-23T19:50:11Z"
+		},
+		{
+			"checksumSHA1": "of1VYIkuYFIom46U7G5/TFetEao=",
+			"path": "github.com/shirou/gopsutil/cpu",
+			"revision": "a81cf97fce2300934e6c625b9917103346c26ba3",
+			"revisionTime": "2020-05-01T13:02:23Z"
+		},
+		{
+			"checksumSHA1": "dtmuVM4CuvI+b/jvskfyHBeZivQ=",
+			"path": "github.com/shirou/gopsutil/internal/common",
+			"revision": "a81cf97fce2300934e6c625b9917103346c26ba3",
+			"revisionTime": "2020-05-01T13:02:23Z"
+		},
+		{
+			"checksumSHA1": "SydHjtJqDKHyu67zw8oDKYnJsoc=",
+			"path": "github.com/shirou/gopsutil/mem",
+			"revision": "a81cf97fce2300934e6c625b9917103346c26ba3",
+			"revisionTime": "2020-05-01T13:02:23Z"
 		},
 		{
 			"checksumSHA1": "xYIWqNSFWyM3pbZ2TufUqmr+0Qo=",
@@ -265,6 +301,12 @@
 			"path": "golang.org/x/sys/unix",
 			"revision": "e4093980e83e70784fc393a93d5620e2654097f0",
 			"revisionTime": "2019-04-01T07:06:21Z"
+		},
+		{
+			"checksumSHA1": "ZYmvJ1qqXG5KHRKVs1tRsRMxj/Q=",
+			"path": "golang.org/x/sys/windows",
+			"revision": "10377860bb8e8e259ba97296f3b7656772f975bc",
+			"revisionTime": "2020-04-30T21:28:04Z"
 		},
 		{
 			"checksumSHA1": "t95/FNK2nGCx3e6IARbO7OrcCuY=",

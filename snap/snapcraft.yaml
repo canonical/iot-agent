@@ -1,5 +1,5 @@
 name: iot-agent
-version: "0.3"
+version: "0.4"
 summary: IoT Device Management Agent using MQTT
 description: |
   The IoT Agent enrolls a device with the IoT Identity service and receives credentials to access the MQTT broker.
