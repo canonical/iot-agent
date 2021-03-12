@@ -26,19 +26,26 @@ parts:
   client:
     plugin: go
     source: .
-    go-importpath: github.com/CanonicalLtd/iot-agent
     override-build: |
-      export GOPATH=$(cd ../go && pwd)
-      GOBIN=$GOPATH/bin
+      mkdir -p ${SNAPCRAFT_PART_BUILD}/src/github.com/CanonicalLtd
+      ln -sf ${SNAPCRAFT_PART_SRC} \
+             ${SNAPCRAFT_PART_BUILD}/src/github.com/CanonicalLtd/iot-agent
+      export GOPATH="${PWD}"
+      export GOBIN="${PWD}/bin"
       PKG=github.com/CanonicalLtd/iot-agent
-      mkdir -p $GOBIN
-      cd $GOPATH/src/$PKG
+      mkdir -p ${GOBIN}
+      cd ${GOPATH}/src/${PKG}
       ./get-deps.sh
       go install ./...
 
-      mkdir -p $SNAPCRAFT_PART_INSTALL/bin
-      cp $GOBIN/agent $SNAPCRAFT_PART_INSTALL/bin/
-      cp $GOBIN/configure $SNAPCRAFT_PART_INSTALL/bin/
-    build-packages:
-      - git
-      - gcc
+      mkdir -p ${SNAPCRAFT_PART_INSTALL}/bin
+      go build -o \
+         ${SNAPCRAFT_PART_INSTALL}/bin/agent \
+         github.com/CanonicalLtd/iot-agent/cmd/agent
+      go build -o \
+         ${SNAPCRAFT_PART_INSTALL}/bin/configure \
+         github.com/CanonicalLtd/iot-agent/cmd/configure
+
+build-packages:
+  - git
+  - gcc
