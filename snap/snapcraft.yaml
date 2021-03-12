@@ -10,7 +10,7 @@ description: |
   The device management features are implemented using the snapd REST API.
 confinement: strict
 grade: stable
-base: core18
+base: core20
 
 apps:
   mqtt:
