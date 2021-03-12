@@ -23,13 +23,8 @@ apps:
       #- shutdown         # but they trigger a manual store review
 
 parts:
-  go:
-    plugin: nil
-    source-tag: go1.12.1
-    source-depth: 1
   client:
     plugin: go
-    after: [go]
     source: .
     go-importpath: github.com/CanonicalLtd/iot-agent
     override-build: |
