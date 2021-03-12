@@ -14,7 +14,7 @@ base: core20
 
 apps:
   mqtt:
-    command: agent
+    command: bin/agent
     daemon: simple
     plugs:
       - network
