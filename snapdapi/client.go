@@ -20,9 +20,10 @@
 package snapdapi
 
 import (
+	"sync"
+
 	"github.com/snapcore/snapd/asserts"
 	"github.com/snapcore/snapd/client"
-	"sync"
 )
 
 // SnapdClient is a client of the snapd REST API
@@ -120,7 +121,7 @@ func (a *ClientAdapter) Ack(b []byte) error {
 
 // Known queries assertions with type assertTypeName and matching assertion headers.
 func (a *ClientAdapter) Known(assertTypeName string, headers map[string]string) ([]asserts.Assertion, error) {
-	return a.snapdClient.Known(assertTypeName, headers)
+	return a.snapdClient.Known(assertTypeName, headers, nil)
 }
 
 // Conf gets the snap's current configuration

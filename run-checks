@@ -10,7 +10,7 @@ export LANG=C.UTF-8
 export LANGUAGE=en
 set -eu
 
-export GO111MODULE=off
+export GO111MODULE=on
 
 if which goctest >/dev/null; then
     goctest="goctest"
@@ -76,11 +76,10 @@ append_coverage() {
 
 
 if [ "$STATIC" = 1 ]; then
-    ./get-deps.sh
 
     echo Checking formatting
     fmt=""
-    for dir in $(go list -f '{{.Dir}}' ./... | grep -v '/vendor/' ); do
+    for dir in $(go list -f '{{.Dir}}' ./... ); do
         s="$(gofmt -s -l "$dir")"
         if [ -n "$s" ]; then
             fmt="$s\n$fmt"
@@ -93,9 +92,6 @@ if [ "$STATIC" = 1 ]; then
         exit 1
     fi
 
-    # go vet
-    echo Running vet
-    go list ./... | grep -v '/vendor/' | xargs go vet
 
     # golint
     echo Install golint
@@ -104,7 +100,7 @@ if [ "$STATIC" = 1 ]; then
     fi
     
     echo Running lint
-    for dir in $(go list -f '{{.Dir}}' ./... | grep -v '/vendor/' ); do
+    for dir in $(go list -f '{{.Dir}}' ./... ); do
         lint="$(golint "$dir")"
         if [ -n "$lint" ]; then
             echo "Lint complains:"
@@ -118,7 +114,7 @@ if [ "$STATIC" = 1 ]; then
         go get -u github.com/client9/misspell/cmd/misspell
     fi
     for file in *; do
-        if [ "$file" = "vendor" ] || [ "$file" = "static" ] || [ "$file" = "webapp-admin" ] || [ "$file" = "webapp-user" ] || [ "$file" = "test" ]; then
+        if [ "$file" = "static" ] || [ "$file" = "webapp-admin" ] || [ "$file" = "webapp-user" ] || [ "$file" = "test" ]; then
             continue
         fi
         misspell -error -i auther,PROCES,PROCESSS,proces,processs,exportfs "$file"
@@ -129,7 +125,7 @@ if [ "$STATIC" = 1 ]; then
         go get -u github.com/gordonklaus/ineffassign
     fi
     # ineffassign knows about ignoring vendor/ \o/
-    ineffassign .
+    ineffassign ./...
 
     echo Checking for naked returns
     if ! which nakedret >/dev/null; then
@@ -143,7 +139,6 @@ if [ "$STATIC" = 1 ]; then
 fi
 
 if [ ! -z "$UNIT" ]; then
-    ./get-deps.sh
 
     # Prepare the coverage output profile.
     rm -rf .coverage
@@ -155,7 +150,7 @@ if [ ! -z "$UNIT" ]; then
 
     # tests
     echo Running tests from "$PWD"
-    for pkg in $(go list ./... | grep -v '/vendor/' ); do
+    for pkg in $(go list ./...); do
         go test -i "$pkg"
         $goctest -v -coverprofile=.coverage/profile.out -covermode="$COVERMODE" "$pkg"
         append_coverage .coverage/profile.out
