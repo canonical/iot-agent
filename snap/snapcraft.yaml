@@ -5,16 +5,15 @@ description: |
   The IoT Agent enrolls a device with the IoT Identity service and receives credentials to access the MQTT broker.
   Via MQTT, it establishes communication with an IoT Management service, so the device can be remotely monitored and managed over a
   secure connection.
-
   The agent is intended to operate on a device running Ubuntu or Ubuntu Core with snapd enabled.
   The device management features are implemented using the snapd REST API.
 confinement: strict
 grade: stable
-base: core18
+base: core20
 
 apps:
   mqtt:
-    command: agent
+    command: bin/agent
     daemon: simple
     plugs:
       - network
@@ -23,27 +22,29 @@ apps:
       #- shutdown         # but they trigger a manual store review
 
 parts:
-  go:
-    plugin: nil
-    source-tag: go1.12.1
-    source-depth: 1
   client:
     plugin: go
-    after: [go]
     source: .
-    go-importpath: github.com/CanonicalLtd/iot-agent
     override-build: |
-      export GOPATH=$(cd ../go && pwd)
-      GOBIN=$GOPATH/bin
+      mkdir -p ${SNAPCRAFT_PART_BUILD}/src/github.com/CanonicalLtd
+      ln -sf ${SNAPCRAFT_PART_SRC} \
+             ${SNAPCRAFT_PART_BUILD}/src/github.com/CanonicalLtd/iot-agent
+      export GOPATH="${PWD}"
+      export GOBIN="${PWD}/bin"
       PKG=github.com/CanonicalLtd/iot-agent
-      mkdir -p $GOBIN
-      cd $GOPATH/src/$PKG
-      ./get-deps.sh
+      mkdir -p ${GOBIN}
+      cd ${GOPATH}
+      rm -f go.mod
+      cd ${GOPATH}/src/${PKG}
+      go get ./...
       go install ./...
-
-      mkdir -p $SNAPCRAFT_PART_INSTALL/bin
-      cp $GOBIN/agent $SNAPCRAFT_PART_INSTALL/bin/
-      cp $GOBIN/configure $SNAPCRAFT_PART_INSTALL/bin/
-    build-packages:
-      - git
-      - gcc
+      mkdir -p ${SNAPCRAFT_PART_INSTALL}/bin
+      go build -o \
+         ${SNAPCRAFT_PART_INSTALL}/bin/agent \
+         github.com/CanonicalLtd/iot-agent/cmd/agent
+      go build -o \
+         ${SNAPCRAFT_PART_INSTALL}/bin/configure \
+         github.com/CanonicalLtd/iot-agent/cmd/configure
+build-packages:
+  - git
+  - gcc

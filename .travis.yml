@@ -9,7 +9,6 @@ env:
 
 before_install:
     - go get golang.org/x/lint/golint
-    - sh ./get-deps.sh
 
 install:
     - echo $GOPATH
