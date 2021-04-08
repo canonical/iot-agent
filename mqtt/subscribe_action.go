@@ -19,8 +19,8 @@ package mqtt
 
 import (
 	"encoding/json"
-	"github.com/CanonicalLtd/iot-agent/snapdapi"
-	"github.com/CanonicalLtd/iot-devicetwin/domain"
+	"github.com/canonical/iot-agent/snapdapi"
+	"github.com/canonical/iot-devicetwin/domain"
 )
 
 // SubscribeAction is the message format for the action topic

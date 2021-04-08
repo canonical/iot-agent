@@ -31,10 +31,10 @@ import (
 	"os"
 	"path"
 
-	"github.com/CanonicalLtd/iot-agent/config"
-	"github.com/CanonicalLtd/iot-agent/snapdapi"
-	"github.com/CanonicalLtd/iot-identity/domain"
-	"github.com/CanonicalLtd/iot-identity/web"
+	"github.com/canonical/iot-agent/config"
+	"github.com/canonical/iot-agent/snapdapi"
+	"github.com/canonical/iot-identity/domain"
+	"github.com/canonical/iot-identity/web"
 )
 
 // Default parameters

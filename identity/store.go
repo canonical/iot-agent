@@ -21,7 +21,7 @@ package identity
 
 import (
 	"encoding/json"
-	"github.com/CanonicalLtd/iot-identity/domain"
+	"github.com/canonical/iot-identity/domain"
 	"io/ioutil"
 )
 

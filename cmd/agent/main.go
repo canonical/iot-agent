@@ -20,13 +20,13 @@
 package main
 
 import (
-	"github.com/CanonicalLtd/iot-agent/mqtt"
-	"github.com/CanonicalLtd/iot-agent/snapdapi"
+	"github.com/canonical/iot-agent/mqtt"
+	"github.com/canonical/iot-agent/snapdapi"
 	"log"
 	"time"
 
-	"github.com/CanonicalLtd/iot-agent/config"
-	"github.com/CanonicalLtd/iot-agent/identity"
+	"github.com/canonical/iot-agent/config"
+	"github.com/canonical/iot-agent/identity"
 )
 
 const tickInterval = 60

@@ -1,5 +1,5 @@
 language: go
-go_import_path: github.com/CanonicalLtd/iot-agent
+go_import_path: github.com/canonical/iot-agent
 go:
   - 1.12
 env:

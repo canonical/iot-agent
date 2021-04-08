@@ -22,7 +22,7 @@ package mqtt
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/CanonicalLtd/iot-devicetwin/domain"
+	"github.com/canonical/iot-devicetwin/domain"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"log"
 )

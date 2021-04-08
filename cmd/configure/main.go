@@ -22,7 +22,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/CanonicalLtd/iot-agent/config"
+	"github.com/canonical/iot-agent/config"
 	"os"
 )
 
