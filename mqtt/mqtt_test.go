@@ -21,9 +21,9 @@ package mqtt
 
 import (
 	"encoding/json"
-	"github.com/CanonicalLtd/iot-agent/snapdapi"
-	twin "github.com/CanonicalLtd/iot-devicetwin/domain"
-	"github.com/CanonicalLtd/iot-identity/domain"
+	"github.com/canonical/iot-agent/snapdapi"
+	twin "github.com/canonical/iot-devicetwin/domain"
+	"github.com/canonical/iot-identity/domain"
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"log"
 	"testing"

@@ -20,7 +20,7 @@
 package main
 
 import (
-	"github.com/CanonicalLtd/iot-agent/config"
+	"github.com/canonical/iot-agent/config"
 	"os"
 	"testing"
 )

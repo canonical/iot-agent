@@ -21,13 +21,13 @@ package identity
 
 import (
 	"fmt"
-	"github.com/CanonicalLtd/iot-agent/snapdapi"
-	"github.com/CanonicalLtd/iot-identity/web"
+	"github.com/canonical/iot-agent/snapdapi"
+	"github.com/canonical/iot-identity/web"
 	"os"
 	"strings"
 	"testing"
 
-	"github.com/CanonicalLtd/iot-agent/config"
+	"github.com/canonical/iot-agent/config"
 )
 
 func TestService_CheckEnrollment(t *testing.T) {
