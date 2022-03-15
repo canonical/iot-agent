@@ -24,6 +24,17 @@ $ ./get-deps.sh
 $ go build ./...
 ```
 
+## Connect Interfaces
+iot-agent uses snapd-control interface which is super powerful. Only the private IoT App Store (aka Brand Store) owners can 
+automatically connect the mentioned interface. To use the iot-agent, one can either install it with --devmode or manually connect
+snapd-control interface. Please note that a snap with snapd-control interface can not be uploaded to the Global Snap Store. iot-agent
+snap is an exception for demonstrating purposes.
+
+```bash
+$ snap connect iot-agent:snapd-control :snapd-control
+```
+
+
 ## Run
 ```bash
 go run cmd/agent/main.go -help

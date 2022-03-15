@@ -18,7 +18,7 @@ apps:
     plugs:
       - network
       - network-bind
-      #- snapd-control    # it needs these privileged interfaces
+      - snapd-control     # it needs these privileged interfaces
       #- shutdown         # but they trigger a manual store review
 
 parts:
