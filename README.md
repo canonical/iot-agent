@@ -18,10 +18,10 @@ The device management features are implemented using the snapd REST API.
 ## Build
 The project uses vendorized dependencies using govendor. Development has been done on minimum Go version 1.12.1.
 ```bash
-$ go get github.com/canonical/iot-agent
 $ cd iot-agent
-$ ./get-deps.sh
-$ go build ./...
+$ go mod tidy
+$ go build cmd/agent/main.go
+$ go build cmd/configure/main.go
 ```
 
 ## Connect Interfaces
