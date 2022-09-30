@@ -1,7 +1,11 @@
+.coverage/
 .idea/
-main
-vendor/*/
 .secret
 main
-.coverage/
+vendor/*/
+
+# Snapcraft
 *.snap
+parts/
+prime/
+stage/
