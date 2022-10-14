@@ -1,5 +1,5 @@
 name: iot-agent
-version: "0.4"
+version: "0.5"
 summary: IoT Device Management Agent using MQTT
 description: |
   The IoT Agent enrolls a device with the IoT Identity service and receives credentials to access the MQTT broker.
@@ -9,7 +9,7 @@ description: |
   The device management features are implemented using the snapd REST API.
 confinement: strict
 grade: stable
-base: core20
+base: core22
 
 apps:
   mqtt:
@@ -19,12 +19,14 @@ apps:
       - network
       - network-bind
       - snapd-control     # it needs these privileged interfaces
-      #- shutdown         # but they trigger a manual store review
+      - shutdown          # but they trigger a manual store review
 
 parts:
   client:
     plugin: go
     source: .
-build-packages:
-  - git
-  - gcc
+    build-snaps:
+      - go
+    build-packages:
+      - git
+      - gcc
