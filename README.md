@@ -1,7 +1,6 @@
 [![Build Status][travis-image]][travis-url]
 [![Go Report Card][goreportcard-image]][goreportcard-url]
 [![codecov][codecov-image]][codecov-url]
-[![Snap Status](https://build.snapcraft.io/badge/canonical/iot-agent.svg)](https://build.snapcraft.io/user/canonical/iot-agent)
 # IoT Agent
 
 The IoT Agent enrolls a device with the [IoT Identity](https://github.com/canonical/iot-identity) service and 
